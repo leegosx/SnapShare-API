@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "snapshare-api"
+version = "0.1"
+description = "PhotoShare is a robust photo-sharing application designed to facilitate the seamless exchange of images among users."
+authors = [
+    "Dmytro Klymenko",
+    "Dmytro Filin",
+    "Illya Grygoriev",
+    "Dmytro Paukov"
+]
+license = "Mit License"
+readme = "README.md"
+packages = [{include = "snapshare_api"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+fastapi = "^0.104.1"
+sqlalchemy = "^2.0.23"
+psycopg2 = "^2.9.9"
+uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
+libgravatar = "^1.0.4"
+python-jose = "^3.3.0"
+pydantic = {extras = ["email"], version = "^2.4.2"}
+cloudinary = "^1.36.0"
+pydantic-settings = "^2.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
