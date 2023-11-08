@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from src.schemas import EmailStr
+from src.schemas.user import EmailStr
 
 class Settings(BaseSettings):
     sqlalchemy_database_url: str = 'postgresql+psycopg2://user:password@localhost:5432/postgres'
@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     cloudinary_name: str = 'CLOUDINARY_NAME'
     cloudinary_api_key: int = 0
     cloudinary_api_secret: str = 'CLOUDINARY_API_SECRET'
-    pythonpath: str = 'PYTHONPATH'
     
     class Config:
         env_file = ".env"
