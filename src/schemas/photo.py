@@ -16,19 +16,17 @@ class PhotoBase(BaseModel):
 
     class Config:
         form_attributes = True
-        orm_mode = True
 
 
 # Pydantic модель для створення нового Photo (без ID і часових відміток)
 class PhotoCreate(BaseModel):
     image_url: str
     content: str
-    user_id: int
     tags: List[int] = []
 
 
-class PhotoUpdate(PhotoBase):
-    pass
+class PhotoUpdate(BaseModel):
+    content: str
 
 
 class PhotoResponse(BaseModel):
@@ -41,4 +39,3 @@ class PhotoResponse(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True

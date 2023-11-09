@@ -39,7 +39,7 @@ def healthchecher(db: Session = Depends(get_db)):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Database is not configured correctly",
             )
-        return {"message": "Welcom to FastApi! Database connected correctly"}
+        return {"message": "Welcome to FastApi! Database connected correctly"}
     except Exception as e:
         print(e)
         raise HTTPException(
