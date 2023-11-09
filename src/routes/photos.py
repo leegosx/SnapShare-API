@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.models import User
+from src.models.user import User
 from src.schemas.photo import PhotoBase, PhotoCreate, PhotoResponse, PhotoUpdate
 from src.repository import photos as repository_photos
 from src.services.auth_service import Auth

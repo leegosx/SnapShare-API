@@ -4,7 +4,7 @@ from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
-from src.routes.photos import photos
+from src.routes import photos
 
 app = FastAPI()
 
