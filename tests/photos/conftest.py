@@ -64,9 +64,9 @@ def app_with_overrides(override_get_db):
 
 
 @pytest.fixture
-async def client(app_with_overrides):
-    async with AsyncClient(app=app_with_overrides, base_url="http://test") as client:
-        yield client
+async def client(app=app) -> AsyncClient:
+    async with AsyncClient(app=app, base_url="http://test") as test_client:
+        yield test_client
 
 
 @pytest.fixture

@@ -3,6 +3,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.photo import Photo
 from src.models.user import User
+from src.schemas.photo import PhotoCreate, PhotoUpdate
 
 # Your fixtures from conftest.py go here (async_session, client, etc.)
 

@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.models.user import User
+from src.models.photo import Photo, Tag
 from src.schemas.photo import PhotoBase, PhotoCreate, PhotoResponse, PhotoUpdate
+from src.schemas.tag import TagResponse
 from src.repository import photos as repository_photos
 from src.services.auth_service import Auth
 
@@ -143,3 +145,28 @@ async def get_photos(
             status_code=status.HTTP_404_NOT_FOUND, detail="Photos not found"
         )
     return photos
+
+router.patch("/add_tags", response_model=PhotoResponse, status_code=status.HTTP_200_OK, summary="Add tags to a photo")
+async def add_tag(
+    body: TagResponse, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    
+    photo = await repository_photos.get_photo_user(photo_id=body.photo_id, current_user=current_user, db=db)
+    if not photo:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+
+    if len(photo.tags) >= 5:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum 5 tags are allowed per photo")
+
+    tag = db.query(Tag).filter_by(name=body.tag).first()
+    if not tag:
+        tag = Tag(name=body.tag)
+        db.add(tag)
+        db.commit()
+
+    if tag not in photo.tags:
+        photo.tags.append(tag)
+        photo_data = PhotoUpdate(content=photo.content)
+        await repository_photos.update_photo(photo_id=photo.id, photo_data=photo_data, current_user=current_user, db=db)
+
+    return photo
+        

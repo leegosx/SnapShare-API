@@ -5,7 +5,8 @@ class Tag(BaseModel):
 
 class TagResponse(BaseModel):
     id: int
-    tags: str
+    tag: str
+    photo_id: int
     
     class Config:
         from_attributes = True

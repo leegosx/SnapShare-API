@@ -1,3 +1,5 @@
+from fastapi import APIRouter, HTTPException, Depends, status
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.models.photo import Photo, Tag
@@ -53,18 +55,16 @@ async def update_photo(
     :return: The updated photo
     :doc-author: Trelent
     """
-    db_photo = (
-        db.query(Photo)
-        .filter(and_(Photo.id == photo_id, Photo.user_id == current_user))
-        .first()
-    )
-    if db_photo:
-        for var, value in vars(photo_data).items():
-            setattr(db_photo, var, value) if value is not None else None
-        db.commit()
-        db.refresh(db_photo)
-    return db_photo
+    photo = db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user == current_user)).first()
+    if photo is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+    for var, value in vars(photo_data).items():
+        setattr(photo, var, value) if value else None
 
+    db.add(photo)
+    db.commit()
+    db.refresh(photo)
+    return photo
 
 async def delete_photo(photo_id: int, current_user, db: Session):
     """
@@ -111,6 +111,19 @@ async def get_photo(photo_id: int, db: Session):
 async def get_photos(skip: int, limit: int, current_user, db: Session):
     """
     The get_photos function returns a list of photos from the database.
+            
+        
+        
+    
+    :param skip: int: Skip the first n photos
+    :param limit: int: Limit the number of photos returned
+    :param current_user: Get the photos of a specific user
+    :param db: Session: Pass the database session to the function
+    :return: A list of photos from the database
+    :doc-author: Trelent
+    """
+    """
+    The get_photos function returns a list of photos from the database.
         
     
     :param skip: int: Skip the first n photos
@@ -121,5 +134,7 @@ async def get_photos(skip: int, limit: int, current_user, db: Session):
     :doc-author: Trelent
     """
     return db.query(Photo).filter(
-        Photo.user_id == current_user.offset(skip).limit(limit).all()
-    )
+        Photo.user_id == current_user.offset(skip).limit(limit).all())
+
+async def get_photo_user(photo_id: int, db: Session, current_user):
+    return await db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user == current_user)).first()
