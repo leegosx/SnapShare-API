@@ -119,7 +119,5 @@ class TestPhotos(unittest.IsolatedAsyncioTestCase):
     #     self.session.execute.return_value.scalars().all.return_value = photos
     #     result = await get_photos(current_user=self.user, db=self.session)
     #     self.assertEqual(result, photos)
-
-
 if __name__ == "__main__":
     unittest.main()

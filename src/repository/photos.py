@@ -1,3 +1,5 @@
+from fastapi import APIRouter, HTTPException, Depends, status
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 from src.models.photo import Photo, Tag
@@ -47,18 +49,16 @@ async def update_photo(
     :return: The updated photo
     :doc-author: Trelent
     """
-    query = select(Photo).filter_by(id=photo_id, user_id=current_user.id)
-    result = await db.execute(query)
-    photo = result.scalars().first()
-    if photo:
-        for var, value in vars(photo_data).items():
-            setattr(photo, var, value) if value is not None else None
-        photo.upd
-        await db.commit()
-        await db.refresh(photo)
-        return photo
-    return None
+    photo = db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user == current_user)).first()
+    if photo is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+    for var, value in vars(photo_data).items():
+        setattr(photo, var, value) if value else None
 
+    db.add(photo)
+    db.commit()
+    db.refresh(photo)
+    return photo
 
 async def delete_photo(photo_id: int, current_user, db: Session):
     """
@@ -122,3 +122,7 @@ async def get_photos(current_user, db: Session):
     result = await db.execute(query)
     photos = result.scalars().all()
     return photos
+
+
+async def get_photo_user(photo_id: int, db: Session, current_user):
+    return await db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user == current_user)).first()
