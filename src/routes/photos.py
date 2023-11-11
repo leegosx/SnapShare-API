@@ -127,13 +127,14 @@ async def get_photo(image_url: str, db: Session = Depends(get_db)):
     return photo
 
 
+@router.get("/photos", response_model=PhotoResponse)
 async def get_photos(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """
     The get_photos function returns a list of photos for the current user.
         The function is called by the get_photos endpoint, which is defined in main.py.
-    
+
     :param current_user: User: Get the current user
     :param db: Session: Get the database session
     :return: A list of photos
@@ -146,16 +147,45 @@ async def get_photos(
         )
     return photos
 
-router.patch("/add_tags", response_model=PhotoResponse, status_code=status.HTTP_200_OK, summary="Add tags to a photo")
+
+@router.patch(
+    "/add_tags",
+    response_model=PhotoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Add tags to a photo",
+)
 async def add_tag(
-    body: TagResponse, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    
-    photo = await repository_photos.get_photo_user(photo_id=body.photo_id, current_user=current_user, db=db)
+    body: TagResponse,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    The add_tag function adds a tag to the photo.
+        The function takes in a TagResponse object, which contains the photo_id and tag name.
+        It then checks if the user has access to that particular photo, and if so it will add
+        that tag to the database (if it doesn't already exist) and append it to that specific
+        photos tags list.
+
+    :param body: TagResponse: Get the tag name and photo id from the request body
+    :param db: Session: Get access to the database
+    :param current_user: User: Get the user that is currently logged in
+    :return: A photo object
+    :doc-author: Trelent
+    """
+
+    photo = await repository_photos.get_photo_user(
+        photo_id=body.photo_id, current_user=current_user, db=db
+    )
     if not photo:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
+        )
 
     if len(photo.tags) >= 5:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum 5 tags are allowed per photo")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum 5 tags are allowed per photo",
+        )
 
     tag = db.query(Tag).filter_by(name=body.tag).first()
     if not tag:
@@ -166,7 +196,8 @@ async def add_tag(
     if tag not in photo.tags:
         photo.tags.append(tag)
         photo_data = PhotoUpdate(content=photo.content)
-        await repository_photos.update_photo(photo_id=photo.id, photo_data=photo_data, current_user=current_user, db=db)
+        await repository_photos.update_photo(
+            photo_id=photo.id, photo_data=photo_data, current_user=current_user, db=db
+        )
 
     return photo
-        

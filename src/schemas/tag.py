@@ -1,12 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from typing import ClassVar
+
 
 class Tag(BaseModel):
     name: str
+
 
 class TagResponse(BaseModel):
     id: int
     tag: str
     photo_id: int
-    
-    class Config:
-        from_attributes = True
+    Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
