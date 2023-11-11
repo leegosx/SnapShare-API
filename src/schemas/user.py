@@ -4,8 +4,9 @@ from typing import ClassVar
 
 
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(min_length=5, max_length=16)
     email: EmailStr
+    password: str
 
 
 class UserDb(BaseModel):

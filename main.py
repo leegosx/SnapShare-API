@@ -1,14 +1,17 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
+import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
-from src.routes import photos
+from src.routes import photos,auth,users
 
 app = FastAPI()
 
 app.include_router(photos.router, prefix="/api")
+app.include_router(auth.router, prefix='/api')
+app.include_router(users.router, prefix='/api')
 
 @app.get("/", name="Корінь проекту")
 def read_root():
@@ -35,14 +38,16 @@ def healthchecher(db: Session = Depends(get_db)):
         result = db.execute(text("SELECT 1")).fetchone()
         print(result)
         if result is None:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database is not configured correctly",
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail="Database is not configured correctly")
         return {"message": "Welcome to FastApi! Database connected correctly"}
     except Exception as e:
         print(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error connecting to the database",
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Error connecting to the database")
+
+
+
+
+if __name__ == '__main__':
+    uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8001)
