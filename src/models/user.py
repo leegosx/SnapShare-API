@@ -4,14 +4,16 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, func
 
 from src.models.base import BaseModel
 
+
 class UserRole(str, enum.Enum):
     Admin = "admin"
     Moderator = "moderator"
     User = "user"
 
+
 class User(BaseModel):
     __tablename__ = "users"
-    
+
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
