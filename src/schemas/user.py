@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
+from typing import ClassVar
 
 
 class UserBase(BaseModel):
@@ -14,9 +15,7 @@ class UserDb(BaseModel):
     email: str
     created_at: datetime
     avatar: str
-
-    class Config:
-        from_attributes = True
+    Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
 
 class UserResponse(BaseModel):

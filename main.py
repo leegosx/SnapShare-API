@@ -5,18 +5,21 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
-from src.routes import auth, users
+from src.routes import photos,auth,users
 
 app = FastAPI()
 
+app.include_router(photos.router, prefix="/api")
+app.include_router(auth.router, prefix='/api')
+app.include_router(users.router, prefix='/api')
 
-@app.get("/", name='Корінь проекту')
+@app.get("/", name="Корінь проекту")
 def read_root():
     """
     The read_root function is a view function that returns the root of the API.
     It's purpose is to provide a simple way for users to test if their connection
     to the API is working properly.
-    
+
     :return: A dictionary
     """
     return {"message": "RestApi is working, all okay!"}
@@ -44,8 +47,7 @@ def healthchecher(db: Session = Depends(get_db)):
                             detail="Error connecting to the database")
 
 
-app.include_router(auth.router, prefix='/api')
-app.include_router(users.router, prefix='/api')
+
 
 if __name__ == '__main__':
     uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8001)
