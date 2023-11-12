@@ -26,9 +26,11 @@ pydantic-settings = "^2.0.3"
 python-dotenv = "^1.0.0"
 alembic = "^1.12.1"
 passlib = "^1.7.4"
+redis = "^5.0.1"
+
 [tool.poetry.dependencies.fastapi-mail]
 version = "^1.4.1"
-redis = "^5.0.1"
+python = "^3.8.1,<4.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -36,6 +38,7 @@ pytest = "^7.4.3"
 httpx = "^0.25.1"
 aiosqlite = "^0.19.0"
 pytest-asyncio = "^0.21.1"
+python-multipart = "^0.0.6"
 
 [build-system]
 requires = ["poetry-core"]

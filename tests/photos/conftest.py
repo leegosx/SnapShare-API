@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from main import app
 from src.models.base import Base
+from tests.photos.test_data_func import *
 from src.database.db import get_db
 
 
@@ -36,6 +37,15 @@ def session():
         # db.add(YourModel(...))  # Add your initial test data here
         # # Add more initial data as needed
         # db.commit()
+
+        # Create random users
+        user = create_test_user_and_test_photo(db)
+
+        # Create random tags
+        tags = create_random_tags(db)
+
+        # Create random photos for each user
+        create_random_photos_for_user(db, user, tags)
 
         yield db
     finally:
