@@ -13,10 +13,10 @@ readme = "README.md"
 packages = [{include = "snapshare_api"}]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
-fastapi = "^0.104.1"
+python = "^3.8"
+fastapi = "^0.103.1"
 sqlalchemy = "^2.0.23"
-psycopg2 = "^2.9.9"
+psycopg2-binary = "^2.9.9"
 uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 libgravatar = "^1.0.4"
 python-jose = "^3.3.0"
@@ -25,7 +25,18 @@ cloudinary = "^1.36.0"
 pydantic-settings = "^2.0.3"
 python-dotenv = "^1.0.0"
 alembic = "^1.12.1"
+redis = "^5.0.1"
+pytest = "^7.4.3"
 
+
+[tool.poetry.dependencies.fastapi-mail]
+version = "^1.4.1"
+python = "^3.8.1,<4.0"
+
+
+
+[tool.poetry.group.test.dependencies]
+httpx = "^0.25.1"
 
 [build-system]
 requires = ["poetry-core"]
