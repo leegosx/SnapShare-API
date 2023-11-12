@@ -26,12 +26,17 @@ pydantic-settings = "^2.0.3"
 python-dotenv = "^1.0.0"
 alembic = "^1.12.1"
 redis = "^5.0.1"
+pytest = "^7.4.3"
 
 
 [tool.poetry.dependencies.fastapi-mail]
 version = "^1.4.1"
 python = "^3.8.1,<4.0"
 
+
+
+[tool.poetry.group.test.dependencies]
+httpx = "^0.25.1"
 
 [build-system]
 requires = ["poetry-core"]
