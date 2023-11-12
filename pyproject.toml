@@ -19,14 +19,17 @@ sqlalchemy = "^2.0.23"
 psycopg2-binary = "^2.9.9"
 uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 libgravatar = "^1.0.4"
-python-jose = "^3.3.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 pydantic = {extras = ["email"], version = "^2.4.2"}
 cloudinary = "^1.36.0"
 pydantic-settings = "^2.0.3"
 python-dotenv = "^1.0.0"
 alembic = "^1.12.1"
-passlib = "^1.7.4"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 redis = "^5.0.1"
+pytest = "^7.4.3"
+python-multipart = "^0.0.6"
+
 
 [tool.poetry.dependencies.fastapi-mail]
 version = "^1.4.1"
@@ -38,7 +41,7 @@ pytest = "^7.4.3"
 httpx = "^0.25.1"
 aiosqlite = "^0.19.0"
 pytest-asyncio = "^0.21.1"
-python-multipart = "^0.0.6"
+fakeredis = "^2.20.0"
 
 [build-system]
 requires = ["poetry-core"]

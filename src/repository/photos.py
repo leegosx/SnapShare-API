@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
 from src.models.photo import Photo, Tag
+from src.models.user import User
 from src.schemas.photo import PhotoCreate, PhotoUpdate
 
 
-async def create_photo(photo_data: PhotoCreate, current_user, db: Session):
+async def create_photo(photo_data: PhotoCreate, current_user: User, db: Session):
     """
     The create_photo function creates a new photo in the database.
         Args:
@@ -27,7 +27,7 @@ async def create_photo(photo_data: PhotoCreate, current_user, db: Session):
     new_photo = Photo(
         image_url=photo_dump["image_url"],
         content=photo_dump["content"],
-        user_id=current_user.id,
+        user_id=current_user["id"],
     )
     new_photo.tags = list_tags
     db.add(new_photo)
@@ -37,7 +37,7 @@ async def create_photo(photo_data: PhotoCreate, current_user, db: Session):
 
 
 async def update_photo(
-    photo_id: int, photo_data: PhotoUpdate, current_user, db: Session
+    photo_id, photo_data: PhotoUpdate, current_user: User, db: Session
 ):
     """
     The update_photo function updates a photo in the database.
@@ -57,7 +57,12 @@ async def update_photo(
     # Compare user_id with current_user.id
     photo = (
         db.query(Photo)
-        .filter(and_(Photo.id == photo_id, Photo.user_id == current_user.id))
+        .filter(
+            and_(
+                Photo.id == photo_id,
+                Photo.user_id == current_user["id"],
+            )
+        )
         .first()
     )
     if photo:
@@ -69,7 +74,7 @@ async def update_photo(
     return photo
 
 
-async def delete_photo(photo_id: int, current_user, db: Session):
+async def delete_photo(photo_id: int, current_user: User, db: Session):
     """
     The delete_photo function deletes a photo from the database.
         Args:
@@ -85,7 +90,7 @@ async def delete_photo(photo_id: int, current_user, db: Session):
     """
     db_photo = (
         db.query(Photo)
-        .filter(and_(Photo.id == photo_id, Photo.user_id == current_user))
+        .filter(and_(Photo.id == photo_id, Photo.user_id == current_user["id"]))
         .first()
     )
     if db_photo:
@@ -111,7 +116,7 @@ async def get_photo(photo_id: int, db: Session):
     return db.query(Photo).filter(and_(Photo.id == photo_id)).first()
 
 
-async def get_photos(skip: int, limit: int, current_user, db: Session):
+async def get_photos(skip: int, limit: int, current_user: User, db: Session):
     """
     The get_photos function returns a list of photos from the database.
     :param skip: int: Skip the first n photos
@@ -134,14 +139,14 @@ async def get_photos(skip: int, limit: int, current_user, db: Session):
     """
     return (
         db.query(Photo)
-        .filter(Photo.user_id == current_user.id)
+        .filter(Photo.user_id == current_user["id"])
         .offset(skip)
         .limit(limit)
         .all()
     )
 
 
-async def get_photo_user(photo_id: int, db: Session, current_user):
+async def get_photo_user(photo_id: int, db: Session, current_user: User):
     """
     The get_photo_user function returns a photo object from the database.
 
@@ -153,7 +158,7 @@ async def get_photo_user(photo_id: int, db: Session, current_user):
     :doc-author: Trelent
     """
     return (
-        await db.query(Photo)
-        .filter(and_(Photo.id == photo_id, Photo.user == current_user))
+        db.query(Photo)
+        .filter(and_(Photo.id == photo_id, Photo.user_id == current_user["id"]))
         .first()
     )

@@ -24,6 +24,7 @@ class PhotoCreate(BaseModel):
 
 
 class PhotoUpdate(BaseModel):
+    image_url: str
     content: str
 
 
