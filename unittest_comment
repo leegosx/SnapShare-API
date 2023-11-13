@@ -1,0 +1,62 @@
+import unittest
+from fastapi.testclient import TestClient
+from main import app
+from src.database.db import get_db
+from src.repository.comments import CommentRepository
+from sqlalchemy.orm import Session
+from src.schemas.comment import CommentRequest
+
+class TestCommentRoutes(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(app)
+        self.comment_repository = CommentRepository()
+
+    def test_create_comment(self):
+        comment_req = CommentRequest(content="Test comment")
+        response = self.client.post("/comments/", json=comment_req.dict())
+        self.assertEqual(response.status_code, 200)
+        created_comment = response.json()
+        self.assertEqual(created_comment["content"], "Test comment")
+        # Перевірка, чи коментар зберігається в базі даних
+        with get_db() as db:  
+            db_comment = self.comment_repository.get_comment_by_id(db, created_comment["id"], created_comment["user_id"])
+            self.assertIsNotNone(db_comment)
+            self.assertEqual(db_comment.content, "Test comment")
+
+    def test_get_comment(self):
+        comment_req = CommentRequest(content="Test comment")
+        response = self.client.post("/comments/", json=comment_req.dict())
+        created_comment = response.json()
+        response = self.client.get(f"/comments/{created_comment['id']}")
+        self.assertEqual(response.status_code, 200)
+        retrieved_comment = response.json()
+        self.assertEqual(retrieved_comment["id"], created_comment["id"])
+        self.assertEqual(retrieved_comment["content"], "Test comment")
+
+    def test_update_comment(self):
+        comment_req = CommentRequest(content="Test comment")
+        response = self.client.post("/comments/", json=comment_req.dict())
+        created_comment = response.json()
+        updated_content = "Updated comment"
+        updated_comment_req = CommentRequest(content=updated_content)
+        response = self.client.put(f"/comments/{created_comment['id']}", json=updated_comment_req.dict())
+        self.assertEqual(response.status_code, 200)
+        updated_comment = response.json()
+        self.assertEqual(updated_comment["id"], created_comment["id"])
+        self.assertEqual(updated_comment["content"], updated_content)
+
+    def test_delete_comment(self):
+        comment_req = CommentRequest(content="Test comment")
+        response = self.client.post("/comments/", json=comment_req.dict())
+        created_comment = response.json()
+        response = self.client.delete(f"/comments/{created_comment['id']}")
+        self.assertEqual(response.status_code, 200)
+        deleted_comment = response.json()
+        self.assertEqual(deleted_comment["id"], created_comment["id"])
+        # Перевірка, чи коментар більше не зберігається в базі даних
+        with get_db() as db:  
+            db_comment = self.comment_repository.get_comment_by_id(db, created_comment["id"], created_comment["user_id"])
+            self.assertIsNone(db_comment)
+
+if __name__ == '__main__':
+    unittest.main()
