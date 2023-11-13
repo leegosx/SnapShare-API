@@ -9,7 +9,7 @@ class CommentRequest(BaseModel):
     
     
 class CommentResponse(BaseModel):
-    comment_id: Optional[int] = None
+    id: Optional[int] = None
     photo_id: int
     user_id: int
     content: str
