@@ -32,3 +32,10 @@ class TokenModel(BaseModel):
 
 class EmailSchema(BaseModel):
     email: EmailStr
+
+
+class ResetPasswordModel(BaseModel):
+    email: EmailStr
+    reset_password_token: str
+    password: str
+    confirm_password: str

@@ -1,14 +1,15 @@
 from typing import List
-
+import uuid
 from fastapi import APIRouter, HTTPException, Depends, status, Security, BackgroundTasks, Request
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.schemas.user import UserBase, UserResponse, TokenModel
+from src.schemas.user import UserBase, UserResponse, TokenModel, ResetPasswordModel
 from src.repository import users as repository_users
-from src.services.auth_service import auth_service
-from src.services.email_service import send_email
+from src.services.auth_service import auth_service, get_token_user
+from src.services.email_service import send_email, send_email_reset_password
 
 router = APIRouter(prefix='/auth', tags=["auth"])
 security = HTTPBearer()
@@ -41,6 +42,14 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
+@router.get("/logout")
+async def logout(token: str = Depends(get_token_user), user=Depends(auth_service.get_current_user)):
+    with open('blacklist.txt', 'a') as file:
+        file.write(f'{token},')
+        user.refresh_token = None
+    return JSONResponse(content={"message": "Logout successful"}, status_code=200)
+
+
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
     token = credentials.credentials
@@ -56,7 +65,7 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.get('/confirmed_email/{token}')
+@router.get('/confirmed_email')
 async def confirmed_email(token: str, db: Session = Depends(get_db)):
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -67,3 +76,49 @@ async def confirmed_email(token: str, db: Session = Depends(get_db)):
     await repository_users.confirmed_email(email, db)
     return {"message": "Email confirmed"}
 
+
+@router.get('/forgot_password')
+async def forgot_password(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_email(email, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found user.")
+    reset_password_token = uuid.uuid1()
+    background_tasks.add_task(
+        send_email_reset_password,
+        str(reset_password_token),
+        user.email,
+        user.username,
+    )
+    user.reset_password_token = reset_password_token
+    db.commit()
+
+    return {
+        "message": f"Reset password token has been sent to your e-email.{reset_password_token}"
+    }
+
+
+@router.patch('/reset_password')
+async def reset_password(body: ResetPasswordModel, db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_email(body.email, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Not found user."
+        )
+
+    if body.reset_password_token != user.reset_password_token:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Password reset tokens doesn't match.",
+        )
+
+    if body.password != body.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="New password is not match."
+        )
+
+    body.password = auth_service.get_password_hash(body.password)
+    user.password = body.password
+    user.reset_password_token = None
+    db.commit()
+
+    return JSONResponse(content={"message": "Your password was successfully changed"}, status_code=200)

@@ -7,10 +7,12 @@ from src.models.user import User
 
 from src.repository.users import (
     get_user_by_email,
+    count_users,
     create_user,
     update_token,
     confirmed_email,
     update_avatar,
+    change_password,
 )
 
 
@@ -33,6 +35,12 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         result = await get_user_by_email(email=self.user.email, db=self.session)
 
         self.assertIsNone(result)
+
+    async def test_count_users(self):
+        users = [User(), User(), User()]
+        self.session.query().all.return_value = users
+        result = await count_users(db=self.session)
+        self.assertEqual(result, users)
 
     async def test_create_user(self):
         body = UserBase(
@@ -61,6 +69,14 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         self.session.query().return_value = self.user
         update_user = await update_avatar(email=self.user.email, url=url, db=self.session)
         self.assertEqual(update_user.avatar, url)
+
+    async def test_change_password(self):
+        new_password = 'new_password'
+
+        update_user = await change_password(self.user, new_password, db=self.session)
+
+        self.assertEqual(update_user.password, new_password)
+        self.session.commit.assert_called_once()
 
 
 if __name__ == '__main__':

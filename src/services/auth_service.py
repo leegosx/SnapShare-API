@@ -13,6 +13,12 @@ from src.database.db import get_db
 from src.repository import users as repository_users
 from src.conf.config import settings
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+
+def get_token_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    return token
+
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

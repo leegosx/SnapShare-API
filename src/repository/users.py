@@ -55,3 +55,9 @@ async def update_avatar(email, url: str, db: Session) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+async def change_password(user: User, new_password: str, db: Session):
+    user.password = new_password
+    db.commit()
+    return user
