@@ -1,3 +1,4 @@
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -8,7 +9,7 @@ from alembic import context
 from src.database.db import SQLALCHEMY_DATABASE_URL
 from src.models.base import Base
 from src.models.comment import Comment
-from src.models.photo import Photo, Tag, photo_m2m_tags
+from src.models.image import Image, Tag, image_m2m_tags
 from src.models.user import User, UserRole
 
 # this is the Alembic Config object, which provides

@@ -6,7 +6,7 @@ import cloudinary.uploader
 
 from src.database.db import get_db
 from src.models.user import User
-from src.schemas.user import UserDb
+from src.schemas.user import UserDb, UserInfo, UserProfile, Username
 from src.repository import users as repository_users
 from src.services.auth_service import auth_service
 from src.conf.config import settings
@@ -14,7 +14,7 @@ from src.conf.config import settings
 router = APIRouter(prefix='/users', tags=["users"])
 
 
-@router.get("/me/", response_model=UserDb)
+@router.get("/me/", response_model=UserInfo)
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
     """
     The read_users_me function returns the current user's information.
@@ -33,7 +33,7 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
     return current_user
 
 
-@router.patch('/avatar', response_model=UserDb)
+@router.patch('/avatar', response_model=UserInfo)
 async def update_avatar_user(file: UploadFile = File(), current_user: User = Depends(auth_service.get_current_user),
                              db: Session = Depends(get_db)):
     """
@@ -56,8 +56,30 @@ async def update_avatar_user(file: UploadFile = File(), current_user: User = Dep
         secure=True
     )
     public_id = f"SnapShare-API/{current_user.username}{current_user.id}"
-    cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)
-    avatar_url = cloudinary.CloudinaryImage(public_id).build_url(width=250, height=250, crop='fill',
-                                                                 version=r.get('version'))
+    r = cloudinary.uploader.upload(file.file, public_id=public_id, owerwrite=True)
+    avatar_url = cloudinary.CloudinaryImage(public_id).build_url(width=250, height=250, crop='fill', version=r.get('version'))
     user = await repository_users.update_avatar(current_user.email, avatar_url, db)
+    
     return user
+
+
+@router.get("/profile/{username}", response_model=UserProfile, status_code=status.HTTP_200_OK)
+async def get_user_profile(username: str, db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_username(username=username, db=db)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user
+
+
+
+@router.patch("/change/{username}", response_model=UserInfo, status_code=status.HTTP_200_OK)
+async def change_username(body: Username, user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):  
+    username_to_search = user.username  
+    found_user = await repository_users.get_user_by_username(username_to_search, db)
+    if found_user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
+
+    found_user.username = body.username
+
+    updated_user = await repository_users.update_user(found_user, db)
+    return updated_user

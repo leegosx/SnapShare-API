@@ -38,3 +38,21 @@ class ResetPasswordModel(BaseModel):
     reset_password_token: str
     password: str
     confirm_password: str
+    
+class UserProfile(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    # uploaded_photos: int
+    avatar: str
+    
+class UserInfo(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    # uploaded_photos: int
+    avatar: str
+    role: str
+    
+class Username(BaseModel):
+    username: str

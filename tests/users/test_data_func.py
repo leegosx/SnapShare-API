@@ -40,7 +40,7 @@ def random_string(length=10):
     return "".join(random.choice(letters) for i in range(length))
 
 
-def create_test_user_and_test_photo(db):
+def create_test_user(db):
     """
     The create_test_user_and_test_photo function creates a test user and a test image.
     The function returns the created user.
@@ -59,11 +59,6 @@ def create_test_user_and_test_photo(db):
     db.add(user)
     db.commit()
     db.refresh(user)
-    image = Image(
-        image_url=test_photo["image_url"],
-        content=test_photo["content"],
-        user_id=user.id,
-    )
     return user
 
 

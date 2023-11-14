@@ -4,7 +4,7 @@ from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.models.user import User
-from src.schemas.user import UserBase
+from src.schemas.user import UserBase, Username
 
 
 async def get_user_by_email(email: str, db: Session) -> Optional[User]:
@@ -22,11 +22,29 @@ async def get_user_by_email(email: str, db: Session) -> Optional[User]:
 
 
 async def count_users(db: Session) -> list:
+    """
+    The count_users function returns a list of all users in the database.
+    
+    :param db: Session: Pass in the database session
+    :return: A list of all the users in the database
+    :doc-author: Trelent
+    """
     users = db.query(User).all()
     return users
 
 
 async def create_user(body: UserBase, db: Session) -> User:
+    """
+    The create_user function creates a new user in the database.
+        It takes a UserBase object as an argument, and returns a User object.
+        The function first checks if there are any users in the database already, 
+            and if not it sets the role of this user to admin. 
+    
+    :param body: UserBase: Pass the user data to the function
+    :param db: Session: Access the database
+    :return: The new user object
+    :doc-author: Trelent
+    """
     users_check = await count_users(db)
     avatar = None
     try:
@@ -100,6 +118,45 @@ async def update_avatar(email, url: str, db: Session) -> User:
 
 
 async def change_password(user: User, new_password: str, db: Session):
+    """
+    The change_password function takes a user object, a new password string, and
+    a database session. It changes the user's password to the new one and commits
+    the change to the database.
+    
+    :param user: User: Pass the user object to the function
+    :param new_password: str: Pass in the new password that we want to set for the user
+    :param db: Session: Pass the database session to the function
+    :return: The user object
+    :doc-author: Trelent
+    """
     user.password = new_password
     db.commit()
+    return user
+
+async def get_user_by_username(username: str, db: Session) -> User:
+    """
+    The get_user_by_username function takes a username and returns the user object associated with that username.
+    If no such user exists, it returns None.
+    
+    :param username: str: Specify the username of the user we want to retrieve
+    :param db: Session: Pass the database session to the function
+    :return: A user object
+    :doc-author: Trelent
+    """
+    return db.query(User).filter(User.username == username).first()
+
+async def update_user(user: User, db: Session):
+    """
+    The update_user function takes a user object and a database session as arguments.
+    It adds the user to the database, commits it, refreshes it, and returns the updated
+    user.
+    
+    :param user: User: Pass in the user object that is to be updated
+    :param db: Session: Pass the database session to the function
+    :return: The user object
+    :doc-author: Trelent
+    """
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return user
