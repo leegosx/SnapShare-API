@@ -5,30 +5,31 @@ from pydantic import BaseModel, ConfigDict
 from src.schemas.tag import Tag
 
 
-class PhotoBase(BaseModel):
+class ImageBase(BaseModel):
     id: Optional[int] = None
     image_url: str
     content: str
     user_id: int
+    image_transformed_url:Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     tags: List[Tag] = []
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
 
-# Pydantic модель для створення нового Photo (без ID і часових відміток)
-class PhotoCreate(BaseModel):
+# Pydantic модель для створення нового image (без ID і часових відміток)
+class ImageCreate(BaseModel):
     image_url: str
     content: str
     tags: List[int] = []
 
 
-class PhotoUpdate(BaseModel):
+class ImageUpdate(BaseModel):
     image_url: str
     content: str
 
 
-class PhotoResponse(BaseModel):
+class ImageResponse(BaseModel):
     id: int
     image_url: str
     created_at: Optional[datetime] = None
