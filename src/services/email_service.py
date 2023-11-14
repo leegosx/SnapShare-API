@@ -23,6 +23,20 @@ conf = ConnectionConfig(
 
 
 async def send_email(email: EmailStr, username: str, host: str):
+    """
+    The send_email function sends an email to the user with a link to confirm their email address.
+        The function takes in three arguments:
+            -email: the user's email address, which is used as a unique identifier for each account.
+            -username: the username of the account that was just created. This is displayed in 
+                confirmation message sent to them via email. 
+            -host: this is used as part of URL that will be sent out in order for users to confirm their accounts.
+    
+    :param email: EmailStr: Validate the email address
+    :param username: str: Pass the username to the template
+    :param host: str: Create the link to confirm the email
+    :return: A coroutine object
+    :doc-author: Trelent
+    """
     try:
         token_verification = auth_service.create_email_token({"sub": email})
         message = MessageSchema(
@@ -39,6 +53,19 @@ async def send_email(email: EmailStr, username: str, host: str):
 
 
 async def send_email_reset_password(token: str, email: EmailStr, username: str):
+    """
+    The send_email_reset_password function sends an email to the user with a link to reset their password.
+        Args:
+            token (str): The token that will be used in the URL for resetting the password.
+            email (EmailStr): The user's email address, which is where they will receive the message.
+            username (str): The username of the person who requested a new password.
+    
+    :param token: str: Pass the token to the template
+    :param email: EmailStr: Specify the email address of the recipient
+    :param username: str: Pass the username to the template
+    :return: A coroutine object
+    :doc-author: Trelent
+    """
     try:
         message = MessageSchema(
             subject="Reset password ",

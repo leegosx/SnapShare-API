@@ -164,6 +164,18 @@ class Auth:
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
     ):
+        """
+        The get_current_user function is a dependency that will be used in the UserController class.
+        It takes in a token and database session as parameters, and returns the user object associated with
+        the email address stored within the JWT token. If no user exists for that email address, or if there is an error decoding
+        the JWT token, then it raises an HTTPException.
+        
+        :param self: Represent the instance of the class
+        :param token: str: Get the token from the authorization header
+        :param db: Session: Pass the database session to the function
+        :return: A user object
+        :doc-author: Trelent
+        """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -195,6 +207,15 @@ class Auth:
         return user
 
     async def get_email_from_token(self, token: str):
+        """
+        The get_email_from_token function takes a token as an argument and returns the email associated with that token.
+        If the scope of the payload is not &quot;email_token&quot;, then it raises an HTTPException. If there is a JWTError, then it also raises an HTTPException.
+        
+        :param self: Represent the instance of the class
+        :param token: str: Pass in the token that we want to decode
+        :return: The email that was encoded in the jwt token
+        :doc-author: Trelent
+        """
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "email_token":
