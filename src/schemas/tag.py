@@ -9,5 +9,5 @@ class Tag(BaseModel):
 class TagResponse(BaseModel):
     id: int
     tag: str
-    photo_id: int
+    image_id: int
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
