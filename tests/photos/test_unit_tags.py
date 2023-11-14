@@ -12,53 +12,53 @@ from unittest.mock import MagicMock, AsyncMock
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from src.repository import images as repository_images
+from src.repository import photos as repository_photos
 from src.schemas.tag import TagResponse
-from src.models.image import Image, Tag
-from src.routes.images import add_tag
+from src.models.photo import Photo, Tag
+from src.routes.photos import add_tag
 
 
 class TestTag(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.session = MagicMock(spec=Session)
         self.current_user = MagicMock()
-        self.image_id = 123
+        self.photo_id = 123
         self.tag_name = "Nature"
 
     async def test_succes_added_tag(self):
-        mock_image = Image(
-            id=self.image_id,
+        mock_photo = Photo(
+            id=self.photo_id,
             image_url="https://example.com/sunset_beach.jpg",
             tags=[],
             content="Test content",
         )
-        repository_images.get_image_user = AsyncMock(return_value=mock_image)
+        repository_photos.get_photo_user = AsyncMock(return_value=mock_photo)
 
         self.session.query().filter_by().first = MagicMock(return_value=None)
 
-        repository_images.update_image = AsyncMock()
+        repository_photos.update_photo = AsyncMock()
 
-        tag_response = TagResponse(id=1, tag=self.tag_name, image_id=self.image_id)
+        tag_response = TagResponse(id=1, tag=self.tag_name, photo_id=self.photo_id)
 
-        updated_image = await add_tag(
+        updated_photo = await add_tag(
             body=tag_response, db=self.session, current_user=self.current_user
         )
 
-        self.assertIn(self.tag_name, [tag.name for tag in updated_image.tags])
-        self.assertEqual(len(updated_image.tags), 1)
-        repository_images.update_image.assert_called_once()
+        self.assertIn(self.tag_name, [tag.name for tag in updated_photo.tags])
+        self.assertEqual(len(updated_photo.tags), 1)
+        repository_photos.update_photo.assert_called_once()
 
-    async def test_add_tag_image_not_found(self):
-        repository_images.get_image_user = AsyncMock(return_value=None)
-        tag_response = TagResponse(id=1, tag=self.tag_name, image_id=self.image_id)
+    async def test_add_tag_photo_not_found(self):
+        repository_photos.get_photo_user = AsyncMock(return_value=None)
+        tag_response = TagResponse(id=1, tag=self.tag_name, photo_id=self.photo_id)
         with self.assertRaises(HTTPException):
             await add_tag(
                 body=tag_response, db=self.session, current_user=self.current_user
             )
 
-    async def test_add_tag_image_max_tags(self):
-        mock_image = Image(
-            id=self.image_id,
+    async def test_add_tag_photo_max_tags(self):
+        mock_photo = Photo(
+            id=self.photo_id,
             image_url="https://example.com/sunset_beach.jpg",
             tags=[
                 Tag(name="Tag1"),
@@ -69,8 +69,8 @@ class TestTag(unittest.IsolatedAsyncioTestCase):
             ],
             content="Test content",
         )
-        repository_images.get_image_user = AsyncMock(return_value=mock_image)
-        tag_response = TagResponse(id=1, tag=self.tag_name, image_id=self.image_id)
+        repository_photos.get_photo_user = AsyncMock(return_value=mock_photo)
+        tag_response = TagResponse(id=1, tag=self.tag_name, photo_id=self.photo_id)
         with self.assertRaises(HTTPException):
             await add_tag(
                 body=tag_response, db=self.session, current_user=self.current_user
@@ -78,19 +78,19 @@ class TestTag(unittest.IsolatedAsyncioTestCase):
 
     async def test_add_tag_existing_tag(self):
         existing_tag = Tag(name=self.tag_name)
-        mock_image = Image(
-            id=self.image_id,
+        mock_photo = Photo(
+            id=self.photo_id,
             image_url="https://example.com/sunset_beach.jpg",
             tags=[],
             content="Test content",
         )
-        repository_images.get_image_user = AsyncMock(return_value=mock_image)
+        repository_photos.get_photo_user = AsyncMock(return_value=mock_photo)
         self.session.query().filter_by().first = MagicMock(return_value=existing_tag)
-        tag_response = TagResponse(id=1, tag=self.tag_name, image_id=self.image_id)
-        updated_image = await add_tag(
+        tag_response = TagResponse(id=1, tag=self.tag_name, photo_id=self.photo_id)
+        updated_photo = await add_tag(
             body=tag_response, db=self.session, current_user=self.current_user
         )
-        self.assertIn(existing_tag, updated_image.tags)
+        self.assertIn(existing_tag, updated_photo.tags)
 
 
 if __name__ == "__main__":

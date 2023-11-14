@@ -5,16 +5,16 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 
 import pytest
-import pickle
-from main import app
-
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.database.db import get_db
+from main import app
 from src.models.base import Base
-from tests.images.test_data_func import *
+from tests.photos.test_data_func import *
+from src.database.db import get_db
+from unittest.mock import patch
+import pickle
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -57,14 +57,20 @@ def session():
 
     db = TestingSessionLocal()
     try:
+        # Insert initial data here
+        # For example, if you have a User model, you can create a test user
+        # db.add(YourModel(...))  # Add your initial test data here
+        # # Add more initial data as needed
+        # db.commit()
+
         # Create random users
-        user = create_test_user_and_test_image(db)
+        user = create_test_user_and_test_photo(db)
 
         # Create random tags
         tags = create_random_tags(db)
 
-        # Create random images for each user
-        create_random_images_for_user(db, user, tags)
+        # Create random photos for each user
+        create_random_photos_for_user(db, user, tags)
 
         yield db
     finally:

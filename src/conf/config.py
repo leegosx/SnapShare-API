@@ -1,6 +1,6 @@
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from src.schemas.user import EmailStr
+from dotenv import load_dotenv
 
 
 class Settings(BaseSettings):
