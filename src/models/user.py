@@ -20,6 +20,6 @@ class User(BaseModel):
     password = Column(String, nullable=False)
     avatar = Column(String, nullable=False)
     role = Column(String, default="user")
-    photos = relationship("Photo", back_populates="user")
+    images = relationship("Image", back_populates="user")
     refresh_token = Column(String, nullable=True)
     confirmed = Column(Boolean, default=False)
