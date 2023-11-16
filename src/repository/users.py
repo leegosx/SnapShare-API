@@ -2,10 +2,11 @@ from typing import Optional, Union
 
 from libgravatar import Gravatar
 from sqlalchemy.orm import Session
-
+from src.services.auth_service import auth_service, pickle
 from src.models.user import User
+from src.models.image import Image, Tag
 from src.schemas.user import UserBase, Username
-
+from src.schemas.tag import TagRequest, TagResponse
 
 async def get_user_by_email(email: str, db: Session) -> Optional[User]:
     """
@@ -16,7 +17,6 @@ async def get_user_by_email(email: str, db: Session) -> Optional[User]:
     :param email: str: Pass in the email of the user we want to retrieve from our database
     :param db: Session: Pass the database session to the function
     :return: The first user with the specified email
-    :doc-author: Trelent
     """
     return db.query(User).filter(User.email == email).first()
 
@@ -27,7 +27,6 @@ async def count_users(db: Session) -> list:
     
     :param db: Session: Pass in the database session
     :return: A list of all the users in the database
-    :doc-author: Trelent
     """
     users = db.query(User).all()
     return users
@@ -43,7 +42,6 @@ async def create_user(body: UserBase, db: Session) -> User:
     :param body: UserBase: Pass the user data to the function
     :param db: Session: Access the database
     :return: The new user object
-    :doc-author: Trelent
     """
     users_check = await count_users(db)
     avatar = None
@@ -75,7 +73,6 @@ async def update_token(user: UserBase, token: Union[str, None], db: Session) -> 
     :param None]: Indicate that the function can accept either a string or none
     :param db: Session: Commit the changes to the database
     :return: None
-    :doc-author: Trelent
     """
     user.refresh_token = token
     db.commit()
@@ -88,7 +85,6 @@ async def confirmed_email(email: str, db: Session) -> None:
     :param email: str: Get the email of the user to confirm
     :param db: Session: Pass the database session to the function
     :return: None
-    :doc-author: Trelent
     """
     user = await get_user_by_email(email, db)
     user.confirmed = True
@@ -108,7 +104,6 @@ async def update_avatar(email, url: str, db: Session) -> User:
     :param url: str: Specify the type of data that will be passed into the function
     :param db: Session: Pass in the database session to the function
     :return: A user object
-    :doc-author: Trelent
     """
     user = await get_user_by_email(email, db)
     user.avatar = url
@@ -127,7 +122,6 @@ async def change_password(user: User, new_password: str, db: Session):
     :param new_password: str: Pass in the new password that we want to set for the user
     :param db: Session: Pass the database session to the function
     :return: The user object
-    :doc-author: Trelent
     """
     user.password = new_password
     db.commit()
@@ -141,7 +135,6 @@ async def get_user_by_username(username: str, db: Session) -> User:
     :param username: str: Specify the username of the user we want to retrieve
     :param db: Session: Pass the database session to the function
     :return: A user object
-    :doc-author: Trelent
     """
     return db.query(User).filter(User.username == username).first()
 
@@ -154,9 +147,24 @@ async def update_user(user: User, db: Session):
     :param user: User: Pass in the user object that is to be updated
     :param db: Session: Pass the database session to the function
     :return: The user object
-    :doc-author: Trelent
     """
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    redis_key = f"user:{user.email}" 
+    auth_service.redis.set(redis_key, pickle.dumps(user))
+    auth_service.redis.expire(redis_key, 900)
+    
     return user
+    
+async def get_user_images(user: User, db: Session) -> list:
+    """
+    The get_user_images function takes a user object and a database session as arguments.
+    It returns the number of images that the user has uploaded.
+    
+    :param user: User: Get the user's id
+    :param db: Session: Access the database
+    :return: The number of images a user has uploaded
+    """
+    return db.query(Image).filter(Image.user_id == user.id).count()

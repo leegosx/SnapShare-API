@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict
 from typing import ClassVar
 
 
-class Tag(BaseModel):
+class TagRequest(BaseModel):
     name: str
 
 

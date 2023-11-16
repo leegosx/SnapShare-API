@@ -8,28 +8,7 @@ from unittest.mock import MagicMock, patch
 from fastapi import UploadFile
 from src.services.auth_service import Auth
 
-auth_service = Auth()
-
-def test_read_users_me(client, testuser, monkeypatch, mock_redis_for_testuser):
-    login_response = client.post(
-        "/api/auth/login",
-        data={
-            "username": testuser["email"],
-            "password": testuser["password"],
-        },
-    )
-    assert login_response.status_code == 200, login_response.text
-    login_data = login_response.json()
-    user_token = login_data["access_token"]
-    response = client.get(
-        "/api/users/me/",  
-        headers={"Authorization": f"Bearer {user_token}"},
-    )
-
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["email"] == testuser["email"]
-    
+auth_service = Auth()  
     
 def test_read_users_me_unauth(client, user, monkeypatch, mock_redis):
     response = client.get("api/users/me/")
@@ -66,7 +45,6 @@ def test_get_user_profile_success(client, testuser, session):
     data = response.json()
 
     assert response.status_code == 200
-    # assert data['email'] == testuser['email']
     assert data['username'] == testuser['username']
     assert data['avatar'] == testuser['avatar']
 

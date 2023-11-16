@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from sqlalchemy.orm import Session
 
@@ -14,10 +14,12 @@ from src.repository.users import (
     get_user_by_username,
     get_user_by_email,
     create_user,
+    count_users,
     update_token,
     confirmed_email,
     update_avatar,
-    update_user
+    update_user,
+    change_password
 )
 
 class TestUsers(unittest.IsolatedAsyncioTestCase):
@@ -35,6 +37,11 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         result = await get_user_by_email(email=self.user.email, db=self.session)
         self.assertEqual(result, self.user)
 
+    async def test_get_authuser_by_email_not_found(self):
+        self.session.query().filter().first.return_value = None
+        result = await get_user_by_email(email=self.user.email, db=self.session)
+        self.assertIsNone(result)
+    
     async def test_get_authuser_by_username_found(self):
         self.session.query().filter().first.return_value = self.user
         result = await get_user_by_username(username=self.user.username, db=self.session)
@@ -44,11 +51,12 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         self.session.query().filter().first.return_value = None
         result = await get_user_by_username(username=self.user.username, db=self.session)
         self.assertIsNone(result)
-
-    async def test_get_authuser_by_email_not_found(self):
-        self.session.query().filter().first.return_value = None
-        result = await get_user_by_email(email=self.user.email, db=self.session)
-        self.assertIsNone(result)
+    
+    async def test_count_users(self):
+        users = [User(), User(), User()]
+        self.session.query().all.return_value = users
+        result = await count_users(db=self.session)
+        self.assertEqual(result, users)
 
     async def test_create_authuser(self):
         result = await create_user(body=self.body, db=self.session)
@@ -68,14 +76,24 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         self.session.query().filter().first.return_value = self.user
         await confirmed_email(email=self.user.email, db=self.session)
         self.assertTrue(self.user.confirmed)
-
+    
     async def test_update_avatar(self):
             self.session.query().filter().first.return_value = self.user
             url = "http://localhost.jpeg"
             result = await update_avatar(email=self.user.email, url=url, db=self.session)
             self.assertEqual(result.avatar, url)
     
-    async def test_update_user(self):
+    async def test_change_password(self):
+        new_password = 'new_password'
+
+        update_user = await change_password(self.user, new_password, db=self.session)
+
+        self.assertEqual(update_user.password, new_password)
+        self.session.commit.assert_called_once()
+    
+    @patch('src.services.auth_service.Auth.redis', create=True)
+    async def test_update_user(self, mock_redis):
+        mock_redis.set.return_value = True
         self.session.query().filter().first.return_value = self.user
 
         self.user.username = "UpdatedUser"

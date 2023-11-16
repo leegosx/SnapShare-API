@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from typing import ClassVar
@@ -42,17 +43,24 @@ class ResetPasswordModel(BaseModel):
 class UserProfile(BaseModel):
     id: int
     username: str
-    email: EmailStr
-    # uploaded_photos: int
+    uploaded_images: Optional[int]
     avatar: str
     
 class UserInfo(BaseModel):
     id: int
     username: str
     email: EmailStr
-    # uploaded_photos: int
+    uploaded_images: Optional[int]
     avatar: str
     role: str
     
 class Username(BaseModel):
     username: str
+    
+class UsernameResonpose(BaseModel):
+    username: str
+    detail: str = "Username successfully changed!"
+    
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str

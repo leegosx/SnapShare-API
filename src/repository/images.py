@@ -6,7 +6,6 @@ from src.models.image import Image, Tag
 from src.models.user import User
 from src.schemas.image import ImageCreate, ImageUpdate
 
-
 async def create_image(image_data: ImageCreate, current_user: User, db: Session):
     """
     The create_image function creates a new image in the database.
@@ -30,7 +29,7 @@ async def create_image(image_data: ImageCreate, current_user: User, db: Session)
     new_image = Image(
         image_url=image_dump["image_url"],
         content=image_dump["content"],
-        user_id=current_user["id"],
+        user_id=current_user['id'],
     )
     new_image.tags = list_tags
     db.add(new_image)

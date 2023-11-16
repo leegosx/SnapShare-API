@@ -205,7 +205,7 @@ class Auth:
             print("GET USER FROM CACHE")
             user = pickle.loads(user)
         return user
-
+    
     async def get_email_from_token(self, token: str):
         """
         The get_email_from_token function takes a token as an argument and returns the email associated with that token.

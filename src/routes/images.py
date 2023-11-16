@@ -7,6 +7,7 @@ from src.models.image import Tag
 from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate
 from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
+from src.repository.users import update_user
 from src.services.auth_service import auth_service
 
 router = APIRouter(prefix="/images", tags=["images"])
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/images", tags=["images"])
 )
 async def create_image(
     body: ImageCreate,
-    current_user: User = Depends(auth_service.get_current_user),
+    user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -31,9 +32,9 @@ async def create_image(
     :return: The created image
     :doc-author: Trelent
     """
-    return await repository_images.create_image(body, current_user, db)
-
-
+    images = await repository_images.create_image(body, user, db)
+    return images
+    
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
     image_id,
@@ -89,6 +90,7 @@ async def delete_image(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
         )
+    # current_user.uploaded_images -= 1
     return image
 
 

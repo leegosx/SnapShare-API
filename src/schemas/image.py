@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional, ClassVar
 from pydantic import BaseModel, ConfigDict
 
-from src.schemas.tag import Tag
+from src.schemas.tag import TagRequest
 
 
 class ImageBase(BaseModel):
@@ -13,7 +13,7 @@ class ImageBase(BaseModel):
     image_transformed_url:Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    tags: List[Tag] = []
+    tags: List[TagRequest] = []
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
 
@@ -35,5 +35,5 @@ class ImageResponse(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     user_id: int
-    tags: List[Tag]
+    tags: List[TagRequest]
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
