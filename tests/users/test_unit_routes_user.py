@@ -4,12 +4,12 @@ from fastapi import UploadFile
 from src.routes.users import update_avatar_user, change_username, read_users_me
 from src.schemas.user import Username
 
-class TestUpdateAvatarUser(unittest.TestCase):
+class TestUpdateAvatarUser(unittest.IsolatedAsyncioTestCase):
 
     @patch('cloudinary.uploader.upload')
     @patch('src.repository.users.update_avatar')
     @patch('src.services.auth_service.Auth.get_current_user')
-    def test_update_avatar_user(self, mock_get_current_user, mock_update_avatar, mock_cloudinary_upload):
+    async def test_update_avatar_user(self, mock_get_current_user, mock_update_avatar, mock_cloudinary_upload):
         mock_user = MagicMock()
         mock_db = MagicMock()
         mock_get_current_user.return_value = mock_user
@@ -22,7 +22,7 @@ class TestUpdateAvatarUser(unittest.TestCase):
         mocked_file.file.read = MagicMock(return_value=b'fake image data')
         mocked_file.content_type = "image/jpeg"
         
-        result = update_avatar_user(file=mocked_file, current_user=mock_user, db=mock_db)
+        result = await update_avatar_user(file=mocked_file, current_user=mock_user, db=mock_db)
 
         self.assertIsNotNone(result)
 
