@@ -69,18 +69,7 @@ def mock_redis(monkeypatch):
 
     # Mock Redis set method to do nothing
     monkeypatch.setattr("redis.StrictRedis.set", lambda *args, **kwargs: None)
-    
-class TestUser:
-    def __init__(self, id, username, email, avatar, role, password, confirmed):
-        self.id = id
-        self.username = username
-        self.email = email
-        self.avatar = avatar
-        self.role = role
-        self.password = password
-        self.confirmed = confirmed    
 
-    
 @pytest.fixture(scope="module")
 def testuser():
     return {

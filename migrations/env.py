@@ -11,6 +11,7 @@ from src.models.base import Base
 from src.models.comment import Comment
 from src.models.image import Image, Tag, image_m2m_tags
 from src.models.user import User, UserRole
+from src.models.rating import Rating
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

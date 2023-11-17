@@ -47,7 +47,7 @@ async def get_rating(rating_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found")
     return await rating
 
-@router.delete("/{rating_id}", response_model=RatingResponse, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{rating_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_rating(rating_id: int, db: Session = Depends(get_db)):
     """
     The remove_rating function removes a rating from the database.

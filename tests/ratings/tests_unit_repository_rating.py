@@ -49,19 +49,19 @@ class TestAsync(unittest.IsolatedAsyncioTestCase):
         self.session.query.assert_called_with(Rating)
         self.assertEqual(rating, expected_rating)
 
-    # async def test_add_rating(self):
-    #     test_rating_request = RatingRequest(rating=5)
-    #     test_image_id = 1
-    #     test_user_id = 1
+    async def test_add_rating(self):
+        test_rating_request = RatingRequest(rating=5)
+        test_image_id = 1
+        test_user_id = 1
 
-    #     new_rating = await add_rating(test_rating_request, test_image_id, test_user_id, self.session)
+        new_rating = await add_rating(test_rating_request, test_image_id, test_user_id, self.session)
 
-    #     self.mock_session.add.assert_called_once()
-    #     self.mock_session.commit.assert_called_once()
+        self.mock_session.add.assert_called_once()
+        self.mock_session.commit.assert_called_once()
 
-    #     self.session.add.assert_called_once()
-    #     self.session.commit.assert_called_once()
-    #     self.session.refresh.assert_called_once_with(new_rating)
+        self.session.add.assert_called_once()
+        self.session.commit.assert_called_once()
+        self.session.refresh.assert_called_once_with(new_rating)
 
 
     async def test_remove_rating_existing_rating(self):
