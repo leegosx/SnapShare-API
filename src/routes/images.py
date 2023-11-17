@@ -1,5 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query
 from sqlalchemy.orm import Session
+
+import cloudinary
+import cloudinary.uploader
 
 from src.database.db import get_db
 from src.models.user import User
@@ -9,6 +12,7 @@ from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
 from src.repository.users import update_user
 from src.services.auth_service import auth_service
+from src.conf.config import settings
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -17,24 +21,40 @@ router = APIRouter(prefix="/images", tags=["images"])
     "/create_new", response_model=ImageResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_image(
-    body: ImageCreate,
+    file: UploadFile = File(...),
+    body: ImageCreate = Depends(),
     user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
     """
-    The create_image function creates a new image in the database.
+    The create_image function creates a new image for the user.
+        The function takes in an ImageCreate object, which is used to create the image.
+        It also takes in a file, which is uploaded to Cloudinary and then stored as an avatar_url on the database.
+        Finally it takes in a User object and Session object from Depends().
 
-
-    :param body: ImageCreate: Pass the image data to the function
-    :param current_user: User: Get the user who is currently logged in
-    :param db: Session: Pass the database session to the repository layer
-    :param : Pass the image_id to the function
-    :return: The created image
+    :param body: ImageCreate: Create a new image in the database
+    :param file: UploadFile: Upload the image to cloudinary
+    :param user: User: Get the user from the database
+    :param db: Session: Create a connection to the database
+    :param : Get the current user from the database
+    :return: The created image object
     :doc-author: Trelent
     """
-    images = await repository_images.create_image(body, user, db)
+    cloudinary.config(
+        cloud_name=settings.cloudinary_name,
+        api_key=settings.cloudinary_api_key,
+        api_secret=settings.cloudinary_api_secret,
+        secure=True,
+    )
+    public_id = f"SnapShare-API/{user.username}{user.id}"
+    r = cloudinary.uploader.upload(file.file, public_id=public_id, owerwrite=True)
+    avatar_url = cloudinary.CloudinaryImage(public_id).build_url(
+        width=250, height=250, crop="fill", version=r.get("version")
+    )
+    images = await repository_images.create_image(avatar_url, body, user, db)
     return images
-    
+
+
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
     image_id,
@@ -48,7 +68,7 @@ async def update_image(
             image_id (int): The id of the image to update.
             body (ImageUpdate): The updated information for the Image object.
             current_user (User = Depends(auth_service.get_current_user)): The user making this request, if any is logged in at all.  If no user is logged in, then this will be None and we'll raise a 401 Unauthorized error when we try to access it later on down below where we check that only admins can update images or that only users who own an
-    
+
     :param image_id: Find the image in the database
     :param body: ImageUpdate: Pass the data that will be used to update the image
     :param current_user: User: Get the user who is currently logged in
@@ -77,7 +97,7 @@ async def delete_image(
             image_id (str): The id of the image to delete.
             current_user (User): The user who is deleting the image.
             db (Session): A database session object for interacting with a PostgreSQL database.
-    
+
     :param image_id: str: Get the image id from the url
     :param current_user: User: Get the user id of the currently logged in user
     :param db: Session: Get the database session
@@ -99,7 +119,7 @@ async def get_image(image_id: str, db: Session = Depends(get_db)):
     """
     The get_image function returns an image object based on the image_id parameter.
     If no such image exists, it raises a 404 error.
-    
+
     :param image_id: str: Get the image id from the url
     :param db: Session: Pass the database session to the function
     :return: An image object
@@ -127,7 +147,7 @@ async def get_images(
           summary: Get all images
           description: Returns a list of all the available images.
           tags: [images]
-    
+
     :param skip: int: Skip the first n images
     :param limit: int: Limit the number of images returned
     :param current_user: User: Get the current user
@@ -157,7 +177,7 @@ async def add_tag(
 ):
     """
     The add_tag function adds a tag to an image.
-    
+
     :param body: TagResponse: Get the data from the request body
     :param db: Session: Pass the database session to the function
     :param current_user: User: Get the current user who is making the request
@@ -193,3 +213,53 @@ async def add_tag(
         )
 
     return image
+
+
+@router.get("/transform_image/")
+def transform_image(
+    image_url: str,
+    transformation_type: str = Query(
+        ...,
+        description="Type of transformation: resize, crop, effect, overlay, face_detect",
+    ),
+    width: int = None,
+    height: int = None,
+    effect: str = None,
+    overlay_image_url: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    try:
+        # Extract the public_id from the image_url
+        public_id = image_url.split("/")[-1].split(".")[0]
+
+        # Define base transformation
+        transformation = {}
+
+        # Apply specific transformation based on type
+        if transformation_type == "resize":
+            transformation.update({"width": width, "height": height, "crop": "limit"})
+        elif transformation_type == "crop":
+            transformation.update({"width": width, "height": height, "crop": "crop"})
+        elif transformation_type == "effect":
+            transformation.update({"effect": effect})
+        elif transformation_type == "overlay":
+            overlay_public_id = overlay_image_url.split("/")[-1].split(".")[0]
+            transformation.update({"overlay": overlay_public_id})
+        elif transformation_type == "face_detect":
+            transformation.update(
+                {"width": width, "height": height, "crop": "thumb", "gravity": "face"}
+            )
+
+        # Apply transformation
+        transformed_url = cloudinary.CloudinaryImage(public_id).image(
+            transformation=transformation
+        )
+        return repository_images.add_transform_url_image(
+            image_url=image_url,
+            transform_url=transformed_url,
+            current_user=current_user,
+            db=db,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -19,9 +19,8 @@ class ImageBase(BaseModel):
 
 # Pydantic модель для створення нового image (без ID і часових відміток)
 class ImageCreate(BaseModel):
-    image_url: str
     content: str
-    tags: List[int] = []
+    tags: List[str] = []
 
 
 class ImageUpdate(BaseModel):
