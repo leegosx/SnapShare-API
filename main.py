@@ -5,10 +5,11 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
+from src.routes import users, auth, images, comments
 
 app = FastAPI()
-app.include_router(comments.router, prefix='/api')
 
+app.include_router(comments.router, prefix='/api')
 app.include_router(images.router, prefix="/api")
 app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
