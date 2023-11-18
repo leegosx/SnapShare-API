@@ -188,8 +188,8 @@ class Auth:
                 email = payload["sub"]
                 if email is None:
                     raise credentials_exception
-                else:
-                    raise credentials_exception
+            else:
+                raise credentials_exception
         except JWTError as e:
             raise credentials_exception
 
@@ -233,4 +233,4 @@ class Auth:
             )
 
 
-auth_service = Auth()   
+auth_service = Auth()
