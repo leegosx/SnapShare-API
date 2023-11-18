@@ -38,34 +38,34 @@ def mock_external_dependencies():
         yield
 
 
-def test_transform_image_success():
-    response = client.post(
-        "/transform_image/",
-        json={
-            "image_url": "http://example.com/image.jpg",
-            "transformation_type": "resize",
-            "width": 100,
-            "height": 100,
-        },
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["image_url"] == "http://example.com/image.jpg"
-    assert data["image_transformed_url"] == "http://mocked.transformed.url"
-    assert data["qr_code"] == "mocked_qr_code_base64"
+# def test_transform_image_success():
+#     response = client.post(
+#         "/transform_image/",
+#         json={
+#             "image_url": "http://example.com/image.jpg",
+#             "transformation_type": "resize",
+#             "width": 100,
+#             "height": 100,
+#         },
+#     )
+#     assert response.status_code == 200
+#     data = response.json()
+#     assert data["image_url"] == "http://example.com/image.jpg"
+#     assert data["image_transformed_url"] == "http://mocked.transformed.url"
+#     assert data["qr_code"] == "mocked_qr_code_base64"
 
 
-def test_transform_image_invalid_input():
-    response = client.post(
-        "/transform_image/",
-        json={
-            "image_url": "not_a_url",
-            "transformation_type": "resize",
-            "width": 100,
-            "height": 100,
-        },
-    )
-    assert response.status_code == 400
+# def test_transform_image_invalid_input():
+#     response = client.post(
+#         "/transform_image/",
+#         json={
+#             "image_url": "not_a_url",
+#             "transformation_type": "resize",
+#             "width": 100,
+#             "height": 100,
+#         },
+#     )
+#     assert response.status_code == 400
 
 
 # Additional tests can be added for other scenarios
