@@ -220,6 +220,29 @@ async def transform_image(
     db: Session = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The transform_image function takes an image_url, transformation_type, width, height, effect and overlay_image_url as parameters.
+    The function then calls the get_cloudinary_image transformation function to transform the image based on the parameters passed in.
+    It then creates a QR code from that transformed url and adds it to our database using repository functions.
+    
+    :param image_url: str: Get the image url from the user
+    :param transformation_type: str: Determine the type of transformation to be applied to the image
+    :param description: Document the api
+    :param crop: Crop the image to a specific width and height
+    :param effect: Apply an effect to the image
+    :param overlay: Specify the public id of an image that you want to overlay on top of your original image
+    :param face_detect&quot;: Detect faces in the image and crop them out
+    :param ): Crop the image to a specific width and height
+    :param width: int: Set the width of the image
+    :param height: int: Set the height of the image
+    :param effect: str: Apply an effect to the image
+    :param overlay_image_url: str: Overlay an image on top of the original image
+    :param db: Session: Get the database session
+    :param user: User: Get the user from the database
+    :param : Determine the type of transformation to be applied on the image
+    :return: A dictionary
+    :doc-author: Trelent
+    """
     try:
         transformed_url = get_cloudinary_image_transformation(
             user, transformation_type, width, height, effect, overlay_image_url

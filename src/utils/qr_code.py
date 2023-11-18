@@ -4,6 +4,13 @@ from io import BytesIO
 
 
 def create_qr_code_from_url(url):
+    """
+    The create_qr_code_from_url function takes a URL as input and returns the base64 encoded string of a QR code image.
+    
+    :param url: Create a qr code from the url
+    :return: A string of base64 encoded image data
+    :doc-author: Trelent
+    """
     # Generate QR code for the transformed URL
     qr = qrcode.QRCode(
         version=1,
