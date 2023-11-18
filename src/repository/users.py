@@ -1,8 +1,9 @@
 from typing import Optional, Union
 
+import pickle
 from libgravatar import Gravatar
 from sqlalchemy.orm import Session
-from src.services.auth_service import auth_service, pickle
+# from src.services.auth_service import auth_service, pickle
 from src.models.user import User
 from src.models.image import Image, Tag
 from src.schemas.user import UserBase, Username
