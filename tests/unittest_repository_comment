@@ -1,0 +1,89 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import unittest
+from unittest.mock import MagicMock
+from src.models.comment import Comment
+from src.repository.comments import create_comment, get_comment, get_comments, update_comment, delete_comment
+from src.schemas.comment import CommentRequest
+
+# from main import app
+
+class TestCreateComment(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.db = MagicMock()
+        self.user = MagicMock()
+        self.user.id = 1  # Припустимо, id користувача
+        self.image_id = 2  # Припустимо, id зображення
+
+    async def test_create_comment(self):
+        comment_data = {"content": "Test comment"}
+        self.db.add = MagicMock()
+        self.db.commit = MagicMock()
+        self.db.refresh = MagicMock()
+
+        new_comment = await create_comment(CommentRequest(**comment_data), self.user, self.image_id, self.db)
+        new_comment.user = self.user
+
+
+        self.assertIsNotNone(new_comment)
+        self.assertEqual(new_comment.content, "Тестовий коментар")
+        self.assertEqual(new_comment.user_id, self.user.id)
+        self.assertEqual(new_comment.image_id, self.image_id)
+        
+        self.user.comments.append(new_comment)
+
+        self.db.add.assert_called_once()
+        self.db.commit.assert_called_once()
+        self.db.refresh.assert_called_once_with(new_comment)
+       
+    async def test_get_comment(self):
+        comment_id = 1  # Припустимо, id коментаря
+        expected_comment = MagicMock()
+        self.db.query().filter().first.return_value = expected_comment
+
+        result = await get_comment(comment_id, self.db)
+
+        self.assertEqual(result, expected_comment)
+        self.db.query().filter().first.assert_called_once_with()
+
+    async def test_get_comments(self):
+        image_id = 2  # Припустимо, id зображення
+        expected_comments = [MagicMock(), MagicMock()]
+        self.db.query().filter().limit().all.return_value = expected_comments
+
+        result = await get_comments(image_id, self.db)
+
+        self.assertEqual(result, expected_comments)
+        self.db.query().filter().limit().all.assert_called_once_with()
+
+    async def test_update_comment(self):
+        comment_id = 1  # Припустимо, id коментаря
+        comment_request = CommentRequest(content="Updated comment")
+        existing_comment = MagicMock()
+        self.db.query().filter().first.return_value = existing_comment
+
+        result = await update_comment(comment_request, comment_id, self.db)
+
+        self.assertEqual(result, existing_comment)
+        self.assertEqual(existing_comment.content, "Updated comment")
+        self.db.query().filter().first.assert_called_once_with()
+        self.db.commit.assert_called_once_with()
+
+    async def test_delete_comment(self):
+        comment_id = 1  # Припустимо, id коментаря
+        existing_comment = MagicMock()
+        self.db.query().filter().first.return_value = existing_comment
+
+        result = await delete_comment(comment_id, self.db)
+
+        self.assertEqual(result, existing_comment)
+        self.db.query().filter().first.assert_called_once_with()
+        self.db.delete.assert_called_once_with(existing_comment)
+        self.db.commit.assert_called_once_with()
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

@@ -4,8 +4,10 @@ from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
+from src.routes import comments
 
 app = FastAPI()
+app.include_router(comments.router, prefix='/api')
 
 @app.get("/", name='Корінь проекту')
 def read_root():

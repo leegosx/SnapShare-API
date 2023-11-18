@@ -10,7 +10,7 @@ class CommentRequest(BaseModel):
     
 class CommentResponse(BaseModel):
     id: Optional[int] = None
-    photo_id: int
+    image_id: int
     user_id: int
     content: str
     created_at: Optional[datetime] = None

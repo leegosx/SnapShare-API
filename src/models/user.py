@@ -19,3 +19,4 @@ class User(BaseModel):
     role = Column(String, default='user')
     refresh_token = Column(String, nullable=True)
     confirmed = Column(Boolean, default=False)
+    
