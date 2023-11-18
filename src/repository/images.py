@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from src.models.image import Image, Tag
 from src.models.user import User
 from src.schemas.image import ImageCreate, ImageUpdate
+from src.repository.ratings import get_ratings
 
 async def create_image(image_data: ImageCreate, current_user: User, db: Session):
     """
@@ -156,3 +157,17 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
         .filter(and_(Image.id == image_id, Image.user_id == current_user["id"]))
         .first()
     )
+    
+    
+async def average_rating(image_id: int, db: Session):
+    image = db.query(Image).filter(Image.id == image_id).first()
+    if image:
+        ratings = get_ratings(db, image_id=image_id)
+        rating_avg = 0
+        if len(ratings):
+            n_ratings = [r.rating for r in ratings]
+            rating_avg = float(sum(n_ratings)) / len(n_ratings)
+        image.rating = rating_avg
+        db.commit()
+        db.refresh(image)
+    return await rating_avg
