@@ -1,79 +1,57 @@
 import sys
 import os
-import json
-from starlette.datastructures import UploadFile
 import unittest
+import asyncio
 from unittest.mock import patch, MagicMock
+from fastapi import UploadFile, status
+from src.routes.images import create_image
+from src.models.image import Image
 
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
-# class TestCreateImage(unittest.TestCase):
-#     @patch("cloudinary.uploader.upload")
-#     @patch("tests.images.conftest.mock_redis")
-#     def test_create_image(
-#         client, user, mock_redis, mock_cloudinary_upload
-#     ):
-#         # Authenticate the user
-#         login_response = client.post(
-#             "/api/auth/login",
-#             data={
-#                 "username": user["email"],
-#                 "password": user["password"],
-#             },
-#         )
-#         assert login_response.status_code == 200, login_response.text
-#         login_data = login_response.json()
-#         user_token = login_data["access_token"]
+class TestCreateImage(unittest.TestCase):
+    @patch("tests.images.conftest.cloudinary.config")
+    @patch("cloudinary.uploader.upload")
+    @patch("cloudinary.CloudinaryImage")
+    def test_create_image(
+        self, mock_cloudinary_image, mock_upload, mock_config
+    ):
+        # Mocking file upload
+        mock_file = MagicMock(spec=UploadFile)
+        mock_file.filename = "test_image.jpg"
+        mock_file.file = MagicMock()
 
-#         # Mock Cloudinary upload response
-#         mock_cloudinary_upload.return_value = {
-#             "public_id": "test_public_id",
-#             "version": "1234",
-#         }
+        # Mocking user and database session
+        mock_user = MagicMock()
+        mock_user.username = "testuser"
+        mock_user.id = "123"
+        mock_db = MagicMock()
 
-#         # Mock file upload
-#         mocked_file = MagicMock(spec=UploadFile)
-#         mocked_file.filename = "test_image.jpg"
-#         mocked_file.file = MagicMock()
-#         mocked_file.file.read = MagicMock(return_value=b"fake image data")
-#         mocked_file.content_type = "image/jpeg"
+        # Mocking Cloudinary upload and URL generation
+        mock_upload.return_value = {"public_id": "test_public_id", "version": "123456"}
+        mock_cloudinary_image.return_value.build_url.return_value = (
+            "http://mocked_url.com"
+        )
 
-#         # Prepare the request with the mock file
-#         files = {"file": mocked_file}
-#         body_data = {
-#             "content": "Beautiful sunset at the beach",
-#             "tags": json.dumps([1, 2, 3]),
-#         }
+        # Mocking ImageCreate and expected response
+        mock_image_create = MagicMock()
+        expected_response = MagicMock()
 
-#         # Create the image with authentication
-#         response = client.post(
-#             "/api/images/create_new",
-#             files={
-#                 "file": (
-#                     mocked_file.filename,
-#                     mocked_file.file.read(),
-#                     mocked_file.content_type,
-#                 )
-#             },
-#             params=body_data,  # Assuming body_data is prepared as before
-#             headers={"Authorization": f"Bearer {user_token}"},
-#         )
+        # Call the function
+        response = asyncio.run(
+            create_image(
+                file=mock_file, body=mock_image_create, user=mock_user, db=mock_db
+            )
+        )
 
-#         # Verify the response
-#         assert response.status_code == 201, response.text
-#         data = response.json()
-#         assert "image_url" in data  # Now the URL is generated in the function
-#         assert "id" in data
-
-#         # Retrieve the image
-#         response = client.get(f"/api/images/{data['id']}")
-
-#         # Verify the response
-#         assert response.status_code == 200, response.text
-#         image_data = response.json()
-#         assert "image_url" in image_data  # Again, verify the URL is present
+        # Assertions
+        self.assertIsInstance(response, Image)  # Assuming Image is the expected type
+        mock_upload.assert_called_once_with(
+            mock_file.file, public_id="SnapShare-API/testuser123", owerwrite=True
+        )
+        mock_cloudinary_image.assert_called_once_with("SnapShare-API/testuser123")
 
 
 def test_update_image(client, user, monkeypatch, mock_redis):

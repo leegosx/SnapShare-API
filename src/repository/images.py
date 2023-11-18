@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from src.models.image import Image, Tag
@@ -47,7 +47,7 @@ async def add_transform_url_image(
     The add_transform_url_image function takes in an image_url, a transform_url, and the current user.
     It then queries the database for an image with that url and user id. If it finds one, it updates
     the transformed url of that image to be equal to the transform_url passed into this function.
-    
+
     :param image_url: str: Get the image url from the database
     :param transform_url: ImageCreate: Create a new imagecreate object
     :param current_user: User: Get the user_id from the database
@@ -60,7 +60,7 @@ async def add_transform_url_image(
         .filter(
             and_(
                 Image.image_url == image_url,
-                Image.user_id == current_user.id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
             )
         )
         .first()
@@ -96,7 +96,7 @@ async def update_image(
         .filter(
             and_(
                 Image.id == image_id,
-                Image.user_id == current_user.id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
             )
         )
         .first()
@@ -126,7 +126,12 @@ async def delete_image(image_id: int, current_user: User, db: Session):
     """
     db_image = (
         db.query(Image)
-        .filter(and_(Image.id == image_id, Image.user_id == current_user.id))
+        .filter(
+            and_(
+                Image.id == image_id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
+            )
+        )
         .first()
     )
     if db_image:
@@ -165,7 +170,9 @@ async def get_images(skip: int, limit: int, current_user: User, db: Session):
     """
     return (
         db.query(Image)
-        .filter(Image.user_id == current_user.id)
+        .filter(
+            or_(Image.user_id == current_user.id, current_user.role == "admin"),
+        )
         .offset(skip)
         .limit(limit)
         .all()
@@ -188,6 +195,11 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
     """
     return (
         db.query(Image)
-        .filter(and_(Image.id == image_id, Image.user_id == current_user.id))
+        .filter(
+            and_(
+                Image.id == image_id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
+            )
+        )
         .first()
     )

@@ -4,6 +4,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
+import cloudinary
 import pytest
 import pickle
 from main import app
@@ -11,6 +12,7 @@ from main import app
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from src.conf.config import settings
 
 
 from src.database.db import get_db
@@ -25,6 +27,13 @@ engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+cloudinary.config(
+    cloud_name=settings.cloudinary_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
 
 
 @pytest.fixture(scope="function")
@@ -48,9 +57,6 @@ def mock_redis(monkeypatch):
 
     # Mock Redis set method to do nothing
     monkeypatch.setattr("redis.StrictRedis.set", lambda *args, **kwargs: None)
-
-
-
 
 
 @pytest.fixture(scope="module")

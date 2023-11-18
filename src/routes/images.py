@@ -1,18 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query
 from sqlalchemy.orm import Session
 
-import cloudinary
-import cloudinary.uploader
-
 from src.database.db import get_db
 from src.models.user import User
 from src.models.image import Tag
-from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate
+from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate, ImageURLResponse
 from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
-from src.repository.users import update_user
+from src.utils.qr_code import create_qr_code_from_url
+from src.utils.image_utils import (
+    post_cloudinary_image,
+    get_cloudinary_image_transformation,
+)
 from src.services.auth_service import auth_service
-from src.conf.config import settings
+
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -40,18 +41,8 @@ async def create_image(
     :return: The created image object
     :doc-author: Trelent
     """
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True,
-    )
-    public_id = f"SnapShare-API/{user.username}{user.id}"
-    r = cloudinary.uploader.upload(file.file, public_id=public_id, owerwrite=True)
-    avatar_url = cloudinary.CloudinaryImage(public_id).build_url(
-        width=250, height=250, crop="fill", version=r.get("version")
-    )
-    images = await repository_images.create_image(avatar_url, body, user, db)
+    image_url = post_cloudinary_image(file, user)
+    images = await repository_images.create_image(image_url, body, user, db)
     return images
 
 
@@ -215,8 +206,8 @@ async def add_tag(
     return image
 
 
-@router.get("/transform_image/")
-def transform_image(
+@router.post("/transform_image/", response_model=ImageURLResponse)
+async def transform_image(
     image_url: str,
     transformation_type: str = Query(
         ...,
@@ -227,39 +218,55 @@ def transform_image(
     effect: str = None,
     overlay_image_url: str = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
+    user: User = Depends(auth_service.get_current_user),
 ):
     try:
-        # Extract the public_id from the image_url
-        public_id = image_url.split("/")[-1].split(".")[0]
-
-        # Define base transformation
-        transformation = {}
-
-        # Apply specific transformation based on type
-        if transformation_type == "resize":
-            transformation.update({"width": width, "height": height, "crop": "limit"})
-        elif transformation_type == "crop":
-            transformation.update({"width": width, "height": height, "crop": "crop"})
-        elif transformation_type == "effect":
-            transformation.update({"effect": effect})
-        elif transformation_type == "overlay":
-            overlay_public_id = overlay_image_url.split("/")[-1].split(".")[0]
-            transformation.update({"overlay": overlay_public_id})
-        elif transformation_type == "face_detect":
-            transformation.update(
-                {"width": width, "height": height, "crop": "thumb", "gravity": "face"}
-            )
-
-        # Apply transformation
-        transformed_url = cloudinary.CloudinaryImage(public_id).image(
-            transformation=transformation
+        transformed_url = get_cloudinary_image_transformation(
+            user, transformation_type, width, height, effect, overlay_image_url
         )
-        return repository_images.add_transform_url_image(
+
+        qr_code = create_qr_code_from_url(transformed_url)
+
+        repository_images.add_transform_url_image(
             image_url=image_url,
             transform_url=transformed_url,
-            current_user=current_user,
+            current_user=user,
             db=db,
         )
+        return {
+            "image_url": image_url,
+            "image_transformed_url": transformed_url,
+            "qr_code": qr_code,
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/transformed_image/{image_id}", response_model=ImageURLResponse)
+async def get_transform_image_url(
+    image_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    The get_transform_image_url function returns the transformed image URL and a QR code for that URL.
+
+
+    :param image_id: str: Get the image from the database
+    :param db: Session: Pass the database connection to the function
+    :param current_user: User: Get the current user
+    :param : Get the image id from the url and then pass it to the function
+    :return: The image_url, the transformed image url and the qr code for that transformed url
+    :doc-author: Trelent
+    """
+    image = await repository_images.get_image(image_id, db)
+
+    qr_code = create_qr_code_from_url(image.image_transformed_url)
+    if image is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
+        )
+    return {
+        "image_url": image.image_url,
+        "image_transformed_url": image.image_transformed_url,
+        "qr_code": qr_code,
+    }
