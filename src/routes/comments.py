@@ -1,15 +1,12 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.schemas.comment import CommentRequest, CommentResponse
 from src.database.db import get_db
-from src.repository.comments import (
-    create_comment,
-    get_comment,
-    List,
-    get_comments,
-    update_comment,
-    delete_comment
-)
+
+from src.repository import comments as repository_comments
+from src.repository import images as repository_images
 
 from src.services.auth_service import auth_service
 from src.models.user import User, UserRole
