@@ -14,29 +14,6 @@ cloudinary.config(
 )
 
 
-# Transformation mapping (can be defined outside the function)
-TRANSFORMATION_MAPPING = {
-    "resize": lambda *args: {"width": args[0], "height": args[1], "crop": "limit"}
-    if len(args) >= 2
-    else {},
-    "crop": lambda *args: {"width": args[0], "height": args[1], "crop": "crop"}
-    if len(args) >= 2
-    else {},
-    "effect": lambda *args: {"effect": args[0]} if len(args) >= 1 else {},
-    "overlay": lambda *args: {"overlay": extract_id_from_url(args[0])}
-    if len(args) >= 1
-    else {},
-    "face_detect": lambda *args: {
-        "width": args[0],
-        "height": args[1],
-        "crop": "thumb",
-        "gravity": "face",
-    }
-    if len(args) >= 2
-    else {},
-}
-
-
 def extract_id_from_url(url):
     """
     Extracts the video ID from a YouTube URL.
@@ -100,10 +77,23 @@ def get_cloudinary_image_transformation(
     :return: A url
     :doc-author: Trelent
     """
-    # Get the transformation
-    transformation = TRANSFORMATION_MAPPING[transformation_type](
-        width, height, effect, overlay_image_url
-    )
+    # Define base transformation
+    transformation = {}
+
+    # Apply specific transformation based on type
+    if transformation_type == "resize":
+        transformation.update({"width": width, "height": height, "crop": "limit"})
+    elif transformation_type == "crop":
+        transformation.update({"width": width, "height": height, "crop": "crop"})
+    elif transformation_type == "effect":
+        transformation.update({"effect": effect})
+    elif transformation_type == "overlay":
+        overlay_public_id = overlay_image_url.split("/")[-1].split(".")[0]
+        transformation.update({"overlay": overlay_public_id})
+    elif transformation_type == "face_detect":
+        transformation.update(
+            {"width": width, "height": height, "crop": "thumb", "gravity": "face"}
+        )
     return cloudinary.CloudinaryImage(get_cloudinary_public_id(user)).build_url(
         transformation=transformation
     )
