@@ -20,4 +20,6 @@ class User(BaseModel):
     avatar = Column(String, nullable=False)
     role = Column(String, default='user')
     refresh_token = Column(String, nullable=True)
+    reset_password_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)
+    ban_status = Column(Boolean, default=False)

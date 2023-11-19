@@ -48,4 +48,4 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
 
 if __name__ == '__main__':
-    uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8001)
+    uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8000)

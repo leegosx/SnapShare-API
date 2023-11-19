@@ -1,7 +1,16 @@
+import pytest
+from fastapi import status
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, ANY
+from unittest import mock
+
+
+from jose import JWTError, jwt
+from pytest_mock import mocker
 
 from src.models.user import User
+from src.routes.auth import send_email
+from src.repository import users as repository_users
 
 
 def test_create_user(client, user, monkeypatch):
@@ -18,6 +27,7 @@ def test_create_user(client, user, monkeypatch):
 
 
 def test_repeat_create_user(client, user):
+
     response = client.post(
         "/api/auth/signup",
         json=user,
@@ -68,3 +78,6 @@ def test_login_wrong_email(client, user):
     assert response.status_code == 401, response.text
     data = response.json()
     assert data["detail"] == "Invalid email"
+
+
+

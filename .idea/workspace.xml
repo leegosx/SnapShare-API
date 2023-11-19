@@ -5,7 +5,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb9716f5-9771-424b-9be2-2353aa5be834" name="Changes" comment="uncomment .idea/">
+      <change beforePath="$PROJECT_DIR$/.idea/SnapShare-API.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SnapShare-API.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/00353fc5127d_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/1b9e40521fcd_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/3144409c7459_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/344190884b0b_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/345e98dd0ff9_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/3e8d79d49f51_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/598fdb28f2ae_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/5e4df12a1bf1_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/64acdff0bbd2_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/97e96edc1e33_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/a54d54717efa_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/be177e22a6b4_initial_tabels.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/e92c0da0f49c_initial_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/fd72d5f99893_init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/conf/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/conf/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/photo.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/photo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/comments.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/photos.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/auth_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/email_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/email_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/photo_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_route_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_route_auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_unit_repository_users.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_unit_repository_users.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,8 +51,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -39,15 +75,19 @@
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/paukovdmitrij/GOIT/PythonWeb/SnapShare-API&quot;
+    &quot;last_opened_file_path&quot;: &quot;/Users/paukovdmitrij/GOIT/PythonWeb/SnapShare-API&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/services" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SnapShare-API" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,9 +109,77 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest for test_route_auth.test_repeat_create_user" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SnapShare-API" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_route_auth.test_repeat_create_user&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in test_blacklist.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SnapShare-API" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_blacklist.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in test_route_logout.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SnapShare-API" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_route_logout.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in test_unit_repository_users.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SnapShare-API" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_unit_repository_users.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python tests.pytest in test_route_logout.py" />
+        <item itemvalue="Python tests.pytest in test_blacklist.py" />
+        <item itemvalue="Python tests.pytest in test_unit_repository_users.py" />
+        <item itemvalue="Python tests.pytest for test_route_auth.test_repeat_create_user" />
       </list>
     </recent_temporary>
   </component>
@@ -98,5 +206,21 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="uncomment .idea/" />
     <option name="LAST_COMMIT_MESSAGE" value="uncomment .idea/" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_unit_repository_users.py</url>
+          <line>113</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_route_logout.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

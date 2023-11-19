@@ -10,6 +10,8 @@ from src.models.base import Base
 from src.models.comment import Comment
 from src.models.photo import Photo, Tag, photo_m2m_tags
 from src.models.user import User, UserRole
+from src.models.blacklist import Blacklist
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
