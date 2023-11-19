@@ -11,19 +11,30 @@ from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.repository.users import get_user_by_email
+from src.repository import users as repository_users
 from src.conf.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def get_token_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """
+    The get_token_user function is a dependency that will be used by the get_current_user function.
+    It takes in a token and returns the user associated with it.
+
+    :param token: str: Pass the token from the http request to this function
+    :param db: Session: Access the database
+    :return: The token, which is a string
+    :doc-author: Trelent
+    """
     return token
 
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = settings.secret_key
-    ALGORITHM = settings.algorithm
+    # ALGORITHM = settings.algorithm
+    ALGORITHM = 'HS256'
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
     redis = redis_db.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
 
@@ -113,14 +124,17 @@ class Auth:
         return encoded_refresh_token
 
     def create_email_token(self, data: dict):
-        """
-        The create_email_token function takes a dictionary of data and returns a token.
-        The token is encoded with the SECRET_KEY, which is stored in the .env file.
-        The algorithm used to encode the token is also stored in the .env file.
 
-        :param self: Make the function a method of the class
+        """
+        The create_email_token function takes in a dictionary of data and returns an encoded JWT token.
+        The function first creates a copy of the data dictionary, then adds three key-value pairs to it:
+        iat (issued at), exp (expiration date), and scope. The iat value is set to datetime.utcnow(),
+        the exp value is set to datetime.utcnow() + timedelta(days=7) which means that the token will expire in 7 days,
+        and the scope value is set to &quot;email_token&quot;. Then we use jwt's encode method with our SECRET_KEY
+
+        :param self: Represent the instance of the class
         :param data: dict: Pass in the data that will be encoded into a jwt
-        :return: A token that is encoded with the user's email and a timestamp
+        :return: A token that is encoded with the user's email address,
         :doc-author: Trelent
         """
         to_encode = data.copy()
@@ -132,15 +146,16 @@ class Auth:
         return token
 
     async def decode_refresh_token(self, refresh_token: str):
+
         """
         The decode_refresh_token function is used to decode the refresh token.
-        It takes a refresh_token as an argument and returns the email of the user if it's valid.
-        If not, it raises an HTTPException with status code 401 (UNAUTHORIZED) and detail 'Could not validate credentials'.
-
+            The function will first try to decode the refresh token using JWT. If it succeeds,
+            then it will check if the scope of that token is 'refresh_token'. If so, then we know
+            that this is a valid refresh token and we can return its email address (which was stored in sub).
 
         :param self: Represent the instance of the class
         :param refresh_token: str: Pass the refresh token to the function
-        :return: The email of the user who is trying to refresh their token
+        :return: The email of the user
         :doc-author: Trelent
         """
         try:
@@ -189,6 +204,12 @@ class Auth:
                     raise credentials_exception
             else:
                 raise credentials_exception
+
+            # Check blacklist token
+            black_list_token = await repository_users.find_black_list_token(token, db)
+            if black_list_token:
+                raise credentials_exception
+
         except JWTError as e:
             raise credentials_exception
 

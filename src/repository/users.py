@@ -2,10 +2,13 @@ from typing import Optional, Union
 
 from libgravatar import Gravatar
 from sqlalchemy.orm import Session
+
+from src.models.blacklist import Blacklist
 from src.models.user import User
 from src.models.image import Image
 from src.schemas.user import UserBase
 from src.services.auth_service import pickle
+from src.services import auth_service
 
 
 async def get_user_by_email(email: str, db: Session) -> Optional[User]:
@@ -127,7 +130,6 @@ async def change_password(user: User, new_password: str, db: Session):
     db.commit()
     return user
 
-
 async def get_user_by_username(username: str, db: Session) -> User:
     """
     The get_user_by_username function takes a username and returns the user object associated with that username.
@@ -171,3 +173,68 @@ async def get_user_images(user: User, db: Session) -> list:
     :return: The number of images a user has uploaded
     """
     return db.query(Image).filter(Image.user_id == user.id).count()
+
+async def save_black_list_token(token: str, current_user: auth_service.get_current_user, db):
+    """
+    The save_black_list_token function saves a token to the blacklist.
+        Args:
+            token (str): The JWT auth_token that is being saved to the blacklist.
+            current_user (User): The user who's token is being saved to the blacklist.
+
+    :param token: str: Pass the token that is being blacklisted
+    :param current_user: auth_service.get_current_user: Get the current user
+    :param db: Access the database
+    :return: The token that was saved
+    :doc-author: Trelent
+    """
+    blacklist_token = Blacklist(token=token, email=current_user.email)
+    db.add(blacklist_token)
+    db.commit()
+    db.refresh(blacklist_token)
+
+
+async def find_black_list_token(token: str, db: Session):
+    """
+    The find_black_list_token function takes in a token and a database session,
+    and returns the first Blacklist object that matches the given token.
+
+
+    :param token: str: Pass in the token that is being checked
+    :param db: Session: Pass the database session to this function
+    :return: A blacklist object if the token is in the blacklist
+    :doc-author: Trelent
+    """
+    return db.query(Blacklist).filter(Blacklist.token == token).first()
+
+
+async def to_ban_user(body: UserBase, email: str, db: Session):
+    """
+    The to_ban_user function takes in a user's email and sets their ban status to True.
+        Args:
+            body (UserBase): The UserBase object containing the user's information.
+            email (str): The user's email address.
+
+    :param body: UserBase: Get the data from the request body
+    :param email: str: Specify the email of the user that is to be banned
+    :param db: Session: Create a connection to the database
+    :return: A user object
+    :doc-author: Trelent
+    """
+    user = db.query(User).filter_by(email=email).first()
+    user.ban_status = True
+    db.commit()
+    return user
+
+
+async def check_ban_status(username: str, db: Session):
+    """
+    The check_ban_status function takes in a username and database session,
+    and returns the ban status of that user. If the user is not found, it will return None.
+
+    :param username: str: Pass in the username of the user that is trying to log in
+    :param db: Session: Access the database
+    :return: A boolean value that indicates whether or not the user is banned
+    :doc-author: Trelent
+    """
+    user = db.query(User).filter_by(email=username).first()
+    return user.ban_status

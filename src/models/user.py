@@ -26,3 +26,4 @@ class User(BaseModel):
     refresh_token = Column(String, nullable=True)
     reset_password_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)
+    ban_status = Column(Boolean, default=False)
