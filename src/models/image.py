@@ -19,6 +19,7 @@ class Image(BaseModel):
     image_transformed_url = Column(String, nullable=True)
     content = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    ratings = relationship("Rating", back_populates="image")
     user = relationship("User", back_populates="images")
     tags = relationship("Tag", secondary=image_m2m_tags, back_populates="images")
 
