@@ -30,10 +30,10 @@ class TestAsync(unittest.IsolatedAsyncioTestCase):
         test_image_id = 1
         test_user_id = 1
         expected_ratings = [MagicMock(spec=Rating), MagicMock(spec=Rating)]
-
+    
         self.session.query().filter().all.return_value = expected_ratings
 
-        ratings = await get_ratings(test_image_id, test_user_id, self.session)
+        ratings = await get_ratings(self.session, test_image_id, test_user_id)
 
         self.session.query.assert_called_with(Rating)
         self.assertEqual(ratings, expected_ratings)
@@ -76,7 +76,7 @@ class TestAsync(unittest.IsolatedAsyncioTestCase):
         self.session.delete.assert_called_once_with(rating_to_remove)
         self.session.commit.assert_called_once()
         self.assertEqual(result, rating_to_remove)
-
+    
 if __name__ == '__main__':
     print(TestAsync.setUp)
     unittest.main()

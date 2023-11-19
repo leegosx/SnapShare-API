@@ -5,17 +5,18 @@ import cloudinary
 import cloudinary.uploader
 
 from src.database.db import get_db
-from src.models.user import User
-from src.schemas.rating import RatingRequest, RatingResponse
+from src.models.user import User, UserRole
+from src.schemas.rating import RatingRequest, RatingResponse, ImageRatingsResponse
 from src.repository import images as repository_images
 from src.repository import ratings as repository_ratings
 from src.services.auth_service import auth_service
-
+from src.services import roles
 
 router = APIRouter(prefix="/rating", tags=["rating"])
 
-@router.get("/all", response_model=List[RatingResponse])
-async def get_all_ratings(image_id: int, db: Session = Depends(get_db)):
+@router.get("/photo/{image_id}", response_model=List[ImageRatingsResponse], 
+            dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
+async def get_by_photo_ratings(image_id: int, db: Session = Depends(get_db)):
     """
     The get_all_ratings function returns all ratings for a given image.
         The function takes an image_id as input and returns a list of rating objects.
@@ -24,13 +25,29 @@ async def get_all_ratings(image_id: int, db: Session = Depends(get_db)):
     :param db: Session: Pass the database session to the function
     :return: A list of ratings
     """
-    images = repository_images.get_image(image_id, db)
+    images = await repository_images.get_image(image_id, db)
     if not images:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
-    ratings = repository_ratings.get_ratings(db, image_id=image_id)
-    return await ratings
+    
+    ratings = await repository_ratings.get_ratings(db, image_id=image_id)
+    if not ratings:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No ratings found for this image")
+    
+    average_rating = sum(rating.rating_score for rating in ratings) / len(ratings) if ratings else 0.0
 
-@router.get("/{rating_id}", response_model=RatingResponse)
+    rating_responses = [
+        ImageRatingsResponse(
+            id=rating.id,
+            user_id=rating.user_id,
+            image_id=rating.image_id,
+            average_rating=average_rating 
+        )
+        for rating in ratings
+    ]
+    return rating_responses
+
+@router.get("/{rating_id}", response_model=RatingResponse, 
+            dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def get_rating(rating_id: int, db: Session = Depends(get_db)):
     """
     The get_rating function returns a rating object based on the id of the rating.
@@ -40,12 +57,13 @@ async def get_rating(rating_id: int, db: Session = Depends(get_db)):
     :param db: Session: Get the database session
     :return: A rating object
     """
-    rating = repository_ratings.get_rating(rating_id, db)
+    rating =await repository_ratings.get_rating(rating_id, db)
     if not rating:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found")
-    return await rating
+    return rating
 
-@router.delete("/{rating_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{rating_id}", status_code=status.HTTP_204_NO_CONTENT, 
+               dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def remove_rating(rating_id: int, db: Session = Depends(get_db)):
     """
     The remove_rating function removes a rating from the database.
@@ -55,11 +73,10 @@ async def remove_rating(rating_id: int, db: Session = Depends(get_db)):
     :param db: Session: Pass the database session to the function
     :return: The removed rating object
     """
-    rating = repository_ratings.remove_rating(rating_id, db)
+    rating = await repository_ratings.remove_rating(rating_id, db)
     if not rating:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found")
-    repository_images.average_rating(rating.image_id, db)
-    return await rating
+    return rating
     
     
 @router.post("/add", response_model=RatingResponse, status_code=status.HTTP_201_CREATED)
@@ -77,14 +94,16 @@ async def add_rating(body: RatingRequest, image_id: int, db: Session = Depends(g
     :return: A rating object
     """
     
-    image = repository_images.get_image(image_id, db)
+    image = await repository_images.get_image(image_id, db)
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
-    existing_rating = repository_ratings.get_ratings(db, image_id=image_id, user_id=current_user.id)
-    if existing_rating:
+    existing_rating = await repository_ratings.get_ratings(db, image_id=image_id, user_id=current_user.id)
+    if len(existing_rating) > 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You have already rated this image")
     if image.user_id == current_user.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot rate your own image")
+    if body.rating not in range(1, 6):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Rating must be between 1 and 5")
     rating = repository_ratings.add_rating(body, image_id, current_user.id, db)
     repository_images.average_rating(image_id, db)
     return await rating

@@ -8,6 +8,7 @@ import string
 from src.models.image import Image, Tag
 from src.models.user import User
 from src.services.auth_service import Auth
+from src.models.rating import Rating
 
 auth_service = Auth()
 
@@ -81,7 +82,7 @@ def create_random_tags(db, num_tags=5):
     return tags
 
 
-def create_random_photos_for_user(db, user, tags, min_images=3, max_images=3):
+def create_random_photos_for_user(db, user_id, min_images=3, max_images=3):
     """
     The create_random_photos_for_user function creates a random number of photos for the given user.
     The number of photos created is between min_photos and max_photos, inclusive.
@@ -95,14 +96,30 @@ def create_random_photos_for_user(db, user, tags, min_images=3, max_images=3):
     :return: The user
     :doc-author: Trelent
     """
+    images = []
     for _ in range(random.randint(min_images, max_images)):
         image = Image(
             image_url="https://example.com/" + random_string(5) + ".jpg",
             content="Random content" + random_string(4),
-            user_id=user.id,
+            user_id=user_id,
         )
-        # Assign one or two random tags
-        for _ in range(random.randint(1, 2)):
-            image.tags.append(random.choice(tags))
         db.add(image)
+        images.append(image)
     db.commit()
+    return images
+    
+def create_test_rating(db, user_id, image_id, rating_score):
+    """
+    The create_test_rating function creates a test rating for the given user and image.
+
+    :param db: Access the database
+    :param user: Assign the user_id to the rating
+    :param image: Assign the image_id to the rating
+    :return: The rating
+    :doc-author: Trelent
+    """
+    new_rating = Rating(user_id=user_id, image_id=image_id, rating_score=rating_score)
+    db.add(new_rating)
+    db.commit()
+    db.refresh(new_rating)
+    return new_rating.id

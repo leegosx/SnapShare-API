@@ -1,12 +1,17 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 import pickle
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from main import app
 from src.models.base import Base
 from src.models.user import User
+from src.models.image import Image
 from src.database.db import get_db
 from ratings.test_data_func import create_test_user
 
@@ -73,10 +78,11 @@ def mock_redis(monkeypatch):
 @pytest.fixture(scope="module")
 def testuser():
     return {
+        "id": 1,
         "username": "testuser",
         "email": "tester123@example.com",
         "avatar": "default.jpg",
-        "role": "user",
+        "role": "admin",
         "uploaded_photos": 3,
         "password": "ptn_pnh123",
         "confirmed": True,
@@ -105,3 +111,32 @@ def mock_redis_for_testuser(monkeypatch):
 
     # Mock Redis set method to do nothing
     monkeypatch.setattr("redis.StrictRedis.set", lambda *args, **kwargs: None)
+    
+@pytest.fixture(scope="module")
+def admin_user():
+    return {
+        "id": 1,  # Ваш реальний ідентифікатор адміністратора
+        "username": "admin",
+        "email": "tester123@example.com",
+        "role": "admin",
+        "password": "ptn_pnh123"
+        # ... інші поля, якщо потрібно ...
+    }
+
+import pytest
+
+@pytest.fixture(scope="module")
+def test_image_id(session, admin_user):
+    # Припускаючи, що admin_user повертає об'єкт користувача, включаючи його ID
+
+    # Перевіряємо, чи вже існує тестове зображення в базі даних
+    test_image = session.query(Image).filter(Image.image_url == "Test Image").first()
+    
+    # Якщо зображення не існує, створюємо його з user_id від адміністратора
+    if not test_image:
+        test_image = Image(image_url="Test Image", content="Test Description", user_id=admin_user['id'])
+        session.add(test_image)
+        session.commit()
+
+    # Повертаємо ID зображення
+    return test_image.id

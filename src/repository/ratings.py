@@ -44,7 +44,7 @@ async def get_rating(rating_id: int, db: Session) -> Rating:
 async def add_rating(body: RatingRequest, image_id: int, user_id: int, db: Session) -> Rating:
     """
     The add_rating function adds a rating to the database.
-        It takes in a RatingRequest object, an image_id, and user_id as parameters.
+        It takes in a RatingRequest objec   t, an image_id, and user_id as parameters.
         The function then creates a new Rating object with the given parameters and adds it to the database.
     
     :param body: RatingRequest: Get the rating from the request body

@@ -247,6 +247,5 @@ class Testimages(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, mock_image)
         db.query.assert_called_with(Image)
 
-
 if __name__ == "__main__":
     unittest.main()
