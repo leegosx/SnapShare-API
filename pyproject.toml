@@ -28,6 +28,7 @@ alembic = "^1.12.1"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 redis = "^5.0.1"
 python-multipart = "^0.0.6"
+pytest-cov = "^4.1.0"
 qrcode = {extras = ["pil"], version = "^7.4.2"}
 
 

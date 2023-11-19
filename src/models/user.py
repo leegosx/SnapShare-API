@@ -21,6 +21,8 @@ class User(BaseModel):
     avatar = Column(String, nullable=False)
     role = Column(String, default="user")
     images = relationship("Image", back_populates="user")
+    ratings = relationship("Rating", back_populates="user")
+    # comments = relationship("Comment", back_populates="user")
     refresh_token = Column(String, nullable=True)
     reset_password_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)

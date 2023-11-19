@@ -290,7 +290,5 @@ class Testimages(unittest.IsolatedAsyncioTestCase):
         self.session.add.assert_not_called()  # Database add should not be called
         self.session.commit.assert_not_called()  # Database commit should not be called
         self.session.refresh.assert_not_called()  # Database refresh should not be called
-
-
 if __name__ == "__main__":
     unittest.main()

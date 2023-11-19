@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.models.image import Image, Tag
 from src.models.user import User
 from src.schemas.image import ImageCreate, ImageUpdate
+from src.repository.ratings import get_ratings
 
 
 async def create_image(
