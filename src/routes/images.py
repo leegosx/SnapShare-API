@@ -224,7 +224,7 @@ async def transform_image(
     The transform_image function takes an image_url, transformation_type, width, height, effect and overlay_image_url as parameters.
     The function then calls the get_cloudinary_image transformation function to transform the image based on the parameters passed in.
     It then creates a QR code from that transformed url and adds it to our database using repository functions.
-    
+
     :param image_url: str: Get the image url from the user
     :param transformation_type: str: Determine the type of transformation to be applied to the image
     :param description: Document the api
@@ -250,7 +250,7 @@ async def transform_image(
 
         qr_code = create_qr_code_from_url(transformed_url)
 
-        repository_images.add_transform_url_image(
+        _ = await repository_images.add_transform_url_image(
             image_url=image_url,
             transform_url=transformed_url,
             current_user=user,
@@ -282,12 +282,16 @@ async def get_transform_image_url(
     :doc-author: Trelent
     """
     image = await repository_images.get_image(image_id, db)
-
-    qr_code = create_qr_code_from_url(image.image_transformed_url)
     if image is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
         )
+    if image.image_transformed_url is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image was not transformed, please transform first."
+        )
+
+    qr_code = create_qr_code_from_url(image.image_transformed_url)
     return {
         "image_url": image.image_url,
         "image_transformed_url": image.image_transformed_url,
