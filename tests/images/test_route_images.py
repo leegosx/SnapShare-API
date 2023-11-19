@@ -1,54 +1,57 @@
 import sys
 import os
+import unittest
+import asyncio
+from unittest.mock import patch, MagicMock
+from fastapi import UploadFile, status
+from src.routes.images import create_image
+from src.models.image import Image
+
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
-def test_create_image(client, user, monkeypatch, mock_redis):
-    # Authenticate the user
-    login_response = client.post(
-        "/api/auth/login",
-        data={
-            "username": user["email"],
-            "password": user["password"],
-        },
-    )
-    assert login_response.status_code == 200, login_response.text
-    login_data = login_response.json()
-    user_token = login_data["access_token"]
+class TestCreateImage(unittest.TestCase):
+    @patch("tests.images.conftest.cloudinary.config")
+    @patch("cloudinary.uploader.upload")
+    @patch("cloudinary.CloudinaryImage")
+    def test_create_image(
+        self, mock_cloudinary_image, mock_upload, mock_config
+    ):
+        # Mocking file upload
+        mock_file = MagicMock(spec=UploadFile)
+        mock_file.filename = "test_image.jpg"
+        mock_file.file = MagicMock()
 
-    created_image_data = {
-        "image_url": "https://example.com/sunset_beach.jpg",
-        "content": "Beautiful sunset at the beach",
-        "tags": [1, 2],
-    }
+        # Mocking user and database session
+        mock_user = MagicMock()
+        mock_user.username = "testuser"
+        mock_user.id = "123"
+        mock_db = MagicMock()
 
-    # Create the image with authentication
-    response = client.post(
-        "/api/images/create_new",  # Add leading slash to the endpoint path
-        json=created_image_data,
-        headers={"Authorization": f"Bearer {user_token}"},
-    )
+        # Mocking Cloudinary upload and URL generation
+        mock_upload.return_value = {"public_id": "test_public_id", "version": "123456"}
+        mock_cloudinary_image.return_value.build_url.return_value = (
+            "http://mocked_url.com"
+        )
 
-    # Verify the response
-    assert (
-        response.status_code
-        == 201  # Expecting '201 Created' or appropriate success code
-    ), response.text
-    data = response.json()
-    assert data["image_url"] == created_image_data["image_url"]
-    assert "id" in data
+        # Mocking ImageCreate and expected response
+        mock_image_create = MagicMock()
+        expected_response = MagicMock()
 
-    # Retrieve the image
-    response = client.get(f"/api/images/{data['id']}")
+        # Call the function
+        response = asyncio.run(
+            create_image(
+                file=mock_file, body=mock_image_create, user=mock_user, db=mock_db
+            )
+        )
 
-    # Verify the response
-    assert response.status_code == 200, response.text
-    image_data = response.json()
-    assert (
-        image_data["image_url"] == created_image_data["image_url"]
-    )  # Verify the image data
-    # Add more assertions as necessary, for example, checking other fields of the image
+        # Assertions
+        self.assertIsInstance(response, Image)  # Assuming Image is the expected type
+        mock_upload.assert_called_once_with(
+            mock_file.file, public_id="SnapShare-API/testuser123", owerwrite=True
+        )
+        mock_cloudinary_image.assert_called_once_with("SnapShare-API/testuser123")
 
 
 def test_update_image(client, user, monkeypatch, mock_redis):
@@ -126,7 +129,7 @@ def test_add_tag(client, user, monkeypatch, mock_redis):
 
     # Prepare the tag data
     tag_data = {
-        'id':-1,
+        "id": -1,
         "image_id": 1,  # Replace with a valid image ID
         "tag": "NewTag",
     }

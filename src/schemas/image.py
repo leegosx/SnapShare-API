@@ -10,7 +10,7 @@ class ImageBase(BaseModel):
     image_url: str
     content: str
     user_id: int
-    image_transformed_url:Optional[str] = None
+    image_transformed_url: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     tags: List[TagRequest] = []
@@ -19,9 +19,8 @@ class ImageBase(BaseModel):
 
 # Pydantic модель для створення нового image (без ID і часових відміток)
 class ImageCreate(BaseModel):
-    image_url: str
     content: str
-    tags: List[int] = []
+    tags: List[str] = []
 
 
 class ImageUpdate(BaseModel):
@@ -37,3 +36,9 @@ class ImageResponse(BaseModel):
     user_id: int
     tags: List[TagRequest]
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
+
+
+class ImageURLResponse(BaseModel):
+    image_url: str
+    image_transformed_url: str
+    qr_code: str

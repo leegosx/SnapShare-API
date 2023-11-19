@@ -1,12 +1,14 @@
-
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from src.models.image import Image, Tag
 from src.models.user import User
 from src.schemas.image import ImageCreate, ImageUpdate
 
-async def create_image(image_data: ImageCreate, current_user: User, db: Session):
+
+async def create_image(
+    image_url: str, image_data: ImageCreate, current_user: User, db: Session
+):
     """
     The create_image function creates a new image in the database.
         Args:
@@ -27,15 +29,48 @@ async def create_image(image_data: ImageCreate, current_user: User, db: Session)
     if len(list_tags) == 0:
         list_tags = [Tag(name=i) for i in image_dump["tags"]]
     new_image = Image(
-        image_url=image_dump["image_url"],
+        image_url=image_url,
         content=image_dump["content"],
-        user_id=current_user['id'],
+        user_id=current_user.id,
     )
     new_image.tags = list_tags
     db.add(new_image)
     db.commit()
     db.refresh(new_image)
     return new_image
+
+
+async def add_transform_url_image(
+    image_url: str, transform_url: ImageCreate, current_user: User, db: Session
+):
+    """
+    The add_transform_url_image function takes in an image_url, a transform_url, and the current user.
+    It then queries the database for an image with that url and user id. If it finds one, it updates
+    the transformed url of that image to be equal to the transform_url passed into this function.
+
+    :param image_url: str: Get the image url from the database
+    :param transform_url: ImageCreate: Create a new imagecreate object
+    :param current_user: User: Get the user_id from the database
+    :param db: Session: Access the database
+    :return: An image object
+    :doc-author: Trelent
+    """
+    image = (
+        db.query(Image)
+        .filter(
+            and_(
+                Image.image_url == image_url,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
+            )
+        )
+        .first()
+    )
+    if image:
+        image.image_transformed_url = transform_url
+        db.add(image)
+        db.commit()
+        db.refresh(image)
+    return image
 
 
 async def update_image(
@@ -61,7 +96,7 @@ async def update_image(
         .filter(
             and_(
                 Image.id == image_id,
-                Image.user_id == current_user["id"],
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
             )
         )
         .first()
@@ -91,7 +126,12 @@ async def delete_image(image_id: int, current_user: User, db: Session):
     """
     db_image = (
         db.query(Image)
-        .filter(and_(Image.id == image_id, Image.user_id == current_user["id"]))
+        .filter(
+            and_(
+                Image.id == image_id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
+            )
+        )
         .first()
     )
     if db_image:
@@ -130,7 +170,9 @@ async def get_images(skip: int, limit: int, current_user: User, db: Session):
     """
     return (
         db.query(Image)
-        .filter(Image.user_id == current_user["id"])
+        .filter(
+            or_(Image.user_id == current_user.id, current_user.role == "admin"),
+        )
         .offset(skip)
         .limit(limit)
         .all()
@@ -144,7 +186,7 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
             image_id (int): The id of an Image object.
             db (Session): A database session to query for images.
             current_user (User): The currently logged in user, used to check ownership of an image.
-    
+
     :param image_id: int: Get the image id from the url
     :param db: Session: Pass the database session to the function
     :param current_user: User: Get the current user
@@ -153,6 +195,11 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
     """
     return (
         db.query(Image)
-        .filter(and_(Image.id == image_id, Image.user_id == current_user["id"]))
+        .filter(
+            and_(
+                Image.id == image_id,
+                or_(Image.user_id == current_user.id, current_user.role == "admin"),
+            )
+        )
         .first()
     )

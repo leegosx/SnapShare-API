@@ -1,14 +1,19 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.models.user import User
 from src.models.image import Tag
-from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate
+from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate, ImageURLResponse
 from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
-from src.repository.users import update_user
+from src.utils.qr_code import create_qr_code_from_url
+from src.utils.image_utils import (
+    post_cloudinary_image,
+    get_cloudinary_image_transformation,
+)
 from src.services.auth_service import auth_service
+
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -17,24 +22,30 @@ router = APIRouter(prefix="/images", tags=["images"])
     "/create_new", response_model=ImageResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_image(
-    body: ImageCreate,
+    file: UploadFile = File(...),
+    body: ImageCreate = Depends(),
     user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
     """
-    The create_image function creates a new image in the database.
+    The create_image function creates a new image for the user.
+        The function takes in an ImageCreate object, which is used to create the image.
+        It also takes in a file, which is uploaded to Cloudinary and then stored as an avatar_url on the database.
+        Finally it takes in a User object and Session object from Depends().
 
-
-    :param body: ImageCreate: Pass the image data to the function
-    :param current_user: User: Get the user who is currently logged in
-    :param db: Session: Pass the database session to the repository layer
-    :param : Pass the image_id to the function
-    :return: The created image
+    :param body: ImageCreate: Create a new image in the database
+    :param file: UploadFile: Upload the image to cloudinary
+    :param user: User: Get the user from the database
+    :param db: Session: Create a connection to the database
+    :param : Get the current user from the database
+    :return: The created image object
     :doc-author: Trelent
     """
-    images = await repository_images.create_image(body, user, db)
+    image_url = post_cloudinary_image(file, user)
+    images = await repository_images.create_image(image_url, body, user, db)
     return images
-    
+
+
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
     image_id,
@@ -48,7 +59,7 @@ async def update_image(
             image_id (int): The id of the image to update.
             body (ImageUpdate): The updated information for the Image object.
             current_user (User = Depends(auth_service.get_current_user)): The user making this request, if any is logged in at all.  If no user is logged in, then this will be None and we'll raise a 401 Unauthorized error when we try to access it later on down below where we check that only admins can update images or that only users who own an
-    
+
     :param image_id: Find the image in the database
     :param body: ImageUpdate: Pass the data that will be used to update the image
     :param current_user: User: Get the user who is currently logged in
@@ -77,7 +88,7 @@ async def delete_image(
             image_id (str): The id of the image to delete.
             current_user (User): The user who is deleting the image.
             db (Session): A database session object for interacting with a PostgreSQL database.
-    
+
     :param image_id: str: Get the image id from the url
     :param current_user: User: Get the user id of the currently logged in user
     :param db: Session: Get the database session
@@ -99,7 +110,7 @@ async def get_image(image_id: str, db: Session = Depends(get_db)):
     """
     The get_image function returns an image object based on the image_id parameter.
     If no such image exists, it raises a 404 error.
-    
+
     :param image_id: str: Get the image id from the url
     :param db: Session: Pass the database session to the function
     :return: An image object
@@ -127,7 +138,7 @@ async def get_images(
           summary: Get all images
           description: Returns a list of all the available images.
           tags: [images]
-    
+
     :param skip: int: Skip the first n images
     :param limit: int: Limit the number of images returned
     :param current_user: User: Get the current user
@@ -157,7 +168,7 @@ async def add_tag(
 ):
     """
     The add_tag function adds a tag to an image.
-    
+
     :param body: TagResponse: Get the data from the request body
     :param db: Session: Pass the database session to the function
     :param current_user: User: Get the current user who is making the request
@@ -193,3 +204,92 @@ async def add_tag(
         )
 
     return image
+
+
+@router.post("/transform_image/", response_model=ImageURLResponse)
+async def transform_image(
+    image_url: str,
+    transformation_type: str = Query(
+        ...,
+        description="Type of transformation: resize, crop, effect, overlay, face_detect",
+    ),
+    width: int = None,
+    height: int = None,
+    effect: str = None,
+    overlay_image_url: str = None,
+    db: Session = Depends(get_db),
+    user: User = Depends(auth_service.get_current_user),
+):
+    """
+    The transform_image function takes an image_url, transformation_type, width, height, effect and overlay_image_url as parameters.
+    The function then calls the get_cloudinary_image transformation function to transform the image based on the parameters passed in.
+    It then creates a QR code from that transformed url and adds it to our database using repository functions.
+    
+    :param image_url: str: Get the image url from the user
+    :param transformation_type: str: Determine the type of transformation to be applied to the image
+    :param description: Document the api
+    :param crop: Crop the image to a specific width and height
+    :param effect: Apply an effect to the image
+    :param overlay: Specify the public id of an image that you want to overlay on top of your original image
+    :param face_detect&quot;: Detect faces in the image and crop them out
+    :param ): Crop the image to a specific width and height
+    :param width: int: Set the width of the image
+    :param height: int: Set the height of the image
+    :param effect: str: Apply an effect to the image
+    :param overlay_image_url: str: Overlay an image on top of the original image
+    :param db: Session: Get the database session
+    :param user: User: Get the user from the database
+    :param : Determine the type of transformation to be applied on the image
+    :return: A dictionary
+    :doc-author: Trelent
+    """
+    try:
+        transformed_url = get_cloudinary_image_transformation(
+            user, transformation_type, width, height, effect, overlay_image_url
+        )
+
+        qr_code = create_qr_code_from_url(transformed_url)
+
+        repository_images.add_transform_url_image(
+            image_url=image_url,
+            transform_url=transformed_url,
+            current_user=user,
+            db=db,
+        )
+        return {
+            "image_url": image_url,
+            "image_transformed_url": transformed_url,
+            "qr_code": qr_code,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/transformed_image/{image_id}", response_model=ImageURLResponse)
+async def get_transform_image_url(
+    image_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    The get_transform_image_url function returns the transformed image URL and a QR code for that URL.
+
+
+    :param image_id: str: Get the image from the database
+    :param db: Session: Pass the database connection to the function
+    :param current_user: User: Get the current user
+    :param : Get the image id from the url and then pass it to the function
+    :return: The image_url, the transformed image url and the qr code for that transformed url
+    :doc-author: Trelent
+    """
+    image = await repository_images.get_image(image_id, db)
+
+    qr_code = create_qr_code_from_url(image.image_transformed_url)
+    if image is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
+        )
+    return {
+        "image_url": image.image_url,
+        "image_transformed_url": image.image_transformed_url,
+        "qr_code": qr_code,
+    }

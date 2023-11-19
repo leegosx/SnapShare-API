@@ -10,9 +10,8 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.repository import users as repository_users
+from src.repository.users import get_user_by_email
 from src.conf.config import settings
-from src.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -196,7 +195,7 @@ class Auth:
         user = self.redis.get(f"user:{email}")
         if user is None:
             print("GET USER FROM POSTGRES")
-            user = await repository_users.get_user_by_email(email, db)
+            user = await get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
             self.redis.set(f"user:{email}", pickle.dumps(user))
