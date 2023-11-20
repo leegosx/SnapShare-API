@@ -1,6 +1,9 @@
-
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
-from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
+from fastapi.security import (
+    OAuth2PasswordRequestForm,
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+)
 from sqlalchemy.orm import Session
 import cloudinary
 import cloudinary.uploader
@@ -145,22 +148,22 @@ async def change_username(
     user = await repository_users.update_user(auth_service.redis ,user, db)
     return user
 
-@router.patch('/ban_user')
-async def ban_user(email: str = Form(), db: Session = Depends(get_db)):
-    """
-    The ban_user function is used to ban a user by email.
-        The function takes an email as input and returns the banned user's details.
+# @router.patch('/ban_user')
+# async def ban_user(email: str = Form(), db: Session = Depends(get_db)):
+#     """
+#     The ban_user function is used to ban a user by email.
+#         The function takes an email as input and returns the banned user's details.
 
-    :param email: str: Get the email of a user from the request body
-    :param db: Session: Get the database session
-    :return: A dictionary with the user and detail
-    :doc-author: Trelent
-    """
-    user = await repository_users.get_user_by_email(email, db)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Such user is not found",
-        )
-    user = await repository_users.to_ban_user(user, email, db)
-    return {"user": user, "detail": "User was banned"}
+#     :param email: str: Get the email of a user from the request body
+#     :param db: Session: Get the database session
+#     :return: A dictionary with the user and detail
+#     :doc-author: Trelent
+#     """
+#     user = await repository_users.get_user_by_email(email, db)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Such user is not found",
+#         )
+#     user = await repository_users.to_ban_user(user, email, db)
+#     return {"user": user, "detail": "User was banned"}

@@ -14,7 +14,7 @@ from src.services import roles
 
 router = APIRouter(prefix="/rating", tags=["rating"])
 
-@router.get("/photo/{image_id}", response_model=List[ImageRatingsResponse], 
+@router.get("/photo/{image_id}/", response_model=List[ImageRatingsResponse], 
             dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def get_by_photo_ratings(image_id: int, db: Session = Depends(get_db)):
     """
@@ -46,7 +46,7 @@ async def get_by_photo_ratings(image_id: int, db: Session = Depends(get_db)):
     ]
     return rating_responses
 
-@router.get("/{rating_id}", response_model=RatingResponse, 
+@router.get("/get/{rating_id}/", response_model=RatingResponse, 
             dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def get_rating(rating_id: int, db: Session = Depends(get_db)):
     """
@@ -62,7 +62,7 @@ async def get_rating(rating_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found")
     return rating
 
-@router.delete("/{rating_id}", status_code=status.HTTP_204_NO_CONTENT, 
+@router.delete("/remove/{rating_id}", status_code=status.HTTP_204_NO_CONTENT, 
                dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def remove_rating(rating_id: int, db: Session = Depends(get_db)):
     """
@@ -79,7 +79,7 @@ async def remove_rating(rating_id: int, db: Session = Depends(get_db)):
     return rating
     
     
-@router.post("/add", response_model=RatingResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/add_rating/", response_model=RatingResponse, status_code=status.HTTP_201_CREATED)
 async def add_rating(body: RatingRequest, image_id: int, db: Session = Depends(get_db), 
                current_user: User = Depends(auth_service.get_current_user)):
     """

@@ -11,3 +11,7 @@ class TagResponse(BaseModel):
     tag: str
     image_id: int
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
+
+class TagModel(BaseModel):
+    id: int
+    name: str
