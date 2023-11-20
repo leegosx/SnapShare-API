@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from main import app
 from src.models.base import Base
@@ -51,6 +51,7 @@ def user():
     return {"username": "deadpool",
             "email": "deadpool@example.com",
             "password": "123456789",
+            "ban_status": "False"
             }
 
 
@@ -78,3 +79,7 @@ def logged_in_user(client, user):
     return data["access_token"]
 
 
+@pytest.fixture
+def mock_find_black_list_token(monkeypatch):
+    with patch("src.routes.auth.repository_users.find_black_list_token") as mock_find_black_list_token:
+        yield mock_find_black_list_token

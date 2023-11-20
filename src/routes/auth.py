@@ -206,7 +206,7 @@ async def reset_password(body: ResetPasswordModel, db: Session = Depends(get_db)
 
     :param body: ResetPasswordModel: Get the email, reset_password_token and password from the request
     :param db: Session: Get the database session
-    :return: A jsonresponse object
+    :return: A json response object
     :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.email, db)
