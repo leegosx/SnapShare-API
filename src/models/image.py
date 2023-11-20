@@ -20,6 +20,7 @@ class Image(BaseModel):
     content = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     ratings = relationship("Rating", back_populates="image")
+    comments = relationship("Comment", back_populates="image")
     user = relationship("User", back_populates="images")
     tags = relationship("Tag", secondary=image_m2m_tags, back_populates="images")
 
