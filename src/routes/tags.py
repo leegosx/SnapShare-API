@@ -9,7 +9,7 @@ from src.schemas.tag import TagRequest, TagResponse, TagModel
 router = APIRouter(prefix='/tags', tags=["tags"])
 
 
-@router.get("/", response_model=List[TagModel])
+@router.get("/all/", response_model=List[TagModel])
 async def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     The read_tags function returns a list of tags.
@@ -30,7 +30,7 @@ async def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     return tags
 
 
-@router.get("/{tag_id}", response_model=TagModel)
+@router.get("/get/{tag_id}/", response_model=TagModel)
 async def read_tag(tag_id: int, db: Session = Depends(get_db)):
     """
     The read_tag function returns a single tag from the database.
@@ -48,7 +48,7 @@ async def read_tag(tag_id: int, db: Session = Depends(get_db)):
     return tag
 
 
-@router.post("/", response_model=TagModel)
+@router.post("/add_tag/", response_model=TagModel)
 async def create_tag(body: TagRequest, db: Session = Depends(get_db)):
     """
     The create_tag function creates a new tag in the database.
@@ -62,7 +62,7 @@ async def create_tag(body: TagRequest, db: Session = Depends(get_db)):
     return tag
 
 
-@router.put("/{tag_id}", response_model=TagModel)
+@router.put("/update/{tag_id}/", response_model=TagModel)
 async def update_tag(body: TagRequest, tag_id: int, db: Session = Depends(get_db)):
     """
     The update_tag function updates a tag in the database.
@@ -82,7 +82,7 @@ async def update_tag(body: TagRequest, tag_id: int, db: Session = Depends(get_db
     return tag
 
 
-@router.delete("/{tag_id}", response_model=TagModel)
+@router.delete("/remove/{tag_id}/", response_model=TagModel)
 async def remove_tag(tag_id: int, db: Session = Depends(get_db)):
     """
     The remove_tag function removes a tag from the database.
