@@ -41,10 +41,18 @@ async def create_image(
     :return: The created image object
     :doc-author: Trelent
     """
+    if len(body.tags) > 5:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum number of tags is 5",
+        )
     image_url = post_cloudinary_image(file, user)
     images = await repository_images.create_image(image_url, body, user, db)
+    if images is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Image not created"
+        )
     return images
-
 
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
