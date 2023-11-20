@@ -7,8 +7,7 @@ from src.models.blacklist import Blacklist
 from src.models.user import User
 from src.models.image import Image
 from src.schemas.user import UserBase
-from src.services.auth_service import pickle
-from src.services import auth_service
+import pickle
 
 
 async def get_user_by_email(email: str, db: Session) -> Optional[User]:
@@ -130,6 +129,7 @@ async def change_password(user: User, new_password: str, db: Session):
     db.commit()
     return user
 
+
 async def get_user_by_username(username: str, db: Session) -> User:
     """
     The get_user_by_username function takes a username and returns the user object associated with that username.
@@ -174,7 +174,8 @@ async def get_user_images(user: User, db: Session) -> list:
     """
     return db.query(Image).filter(Image.user_id == user.id).count()
 
-async def save_black_list_token(token: str, current_user: auth_service.get_current_user, db):
+
+async def save_black_list_token(token: str, user: User, db):
     """
     The save_black_list_token function saves a token to the blacklist.
         Args:
@@ -187,7 +188,7 @@ async def save_black_list_token(token: str, current_user: auth_service.get_curre
     :return: The token that was saved
     :doc-author: Trelent
     """
-    blacklist_token = Blacklist(token=token, email=current_user.email)
+    blacklist_token = Blacklist(token=token, email=user.email)
     db.add(blacklist_token)
     db.commit()
     db.refresh(blacklist_token)

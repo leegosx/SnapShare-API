@@ -1,14 +1,6 @@
-<<<<<<< HEAD
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
-from fastapi.security import (
-    OAuth2PasswordRequestForm,
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-)
-=======
+
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
->>>>>>> origin/feature/auth
 from sqlalchemy.orm import Session
 import cloudinary
 import cloudinary.uploader
@@ -150,7 +142,7 @@ async def change_username(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken"
         )
     user.username = body.username
-    user = await repository_users.update_user(auth_service.redis,user, db)
+    user = await repository_users.update_user(auth_service.redis ,user, db)
     return user
 
 @router.patch('/ban_user')
