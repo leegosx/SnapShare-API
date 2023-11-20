@@ -8,7 +8,6 @@ from src.models.user import User
 from src.models.image import Image
 from src.schemas.user import UserBase
 from src.services.auth_service import pickle
-from src.services import auth_service
 
 
 async def get_user_by_email(email: str, db: Session) -> Optional[User]:
