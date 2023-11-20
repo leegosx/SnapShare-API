@@ -173,23 +173,23 @@ async def get_user_images(user: User, db: Session) -> list:
     """
     return db.query(Image).filter(Image.user_id == user.id).count()
 
-async def save_black_list_token(token: str, current_user: auth_service.get_current_user, db):
-    """
-    The save_black_list_token function saves a token to the blacklist.
-        Args:
-            token (str): The JWT auth_token that is being saved to the blacklist.
-            current_user (User): The user who's token is being saved to the blacklist.
+# async def save_black_list_token(token: str, current_user: Auth.get_current_user, db):
+#     """
+#     The save_black_list_token function saves a token to the blacklist.
+#         Args:
+#             token (str): The JWT auth_token that is being saved to the blacklist.
+#             current_user (User): The user who's token is being saved to the blacklist.
 
-    :param token: str: Pass the token that is being blacklisted
-    :param current_user: auth_service.get_current_user: Get the current user
-    :param db: Access the database
-    :return: The token that was saved
-    :doc-author: Trelent
-    """
-    blacklist_token = Blacklist(token=token, email=current_user.email)
-    db.add(blacklist_token)
-    db.commit()
-    db.refresh(blacklist_token)
+#     :param token: str: Pass the token that is being blacklisted
+#     :param current_user: auth_service.get_current_user: Get the current user
+#     :param db: Access the database
+#     :return: The token that was saved
+#     :doc-author: Trelent
+#     """
+#     blacklist_token = Blacklist(token=token, email=current_user.email)
+#     db.add(blacklist_token)
+#     db.commit()
+#     db.refresh(blacklist_token)
 
 
 async def find_black_list_token(token: str, db: Session):

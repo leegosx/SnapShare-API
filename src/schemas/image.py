@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional, ClassVar
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, validator
 
 from src.schemas.tag import TagRequest
 
@@ -16,12 +16,10 @@ class ImageBase(BaseModel):
     tags: List[TagRequest] = []
     Config: ClassVar[ConfigDict] = ConfigDict(from_attributes=True)
 
-
 # Pydantic модель для створення нового image (без ID і часових відміток)
 class ImageCreate(BaseModel):
     content: str
     tags: List[str] = []
-
 
 class ImageUpdate(BaseModel):
     image_url: str
