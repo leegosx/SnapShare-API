@@ -16,14 +16,14 @@ cloudinary.config(
 
 def extract_id_from_url(url):
     """
-    Extracts the video ID from a YouTube URL.
+    Extracts the  ID from URL.
 
     Example:
         >>> extract_id_from_url("http://youtube.com/watch?v=dQw4w9WgXcQ")
         'dQw4w9WgXcQ'
 
-    :param url: YouTube URL
-    :return: Video ID as a string
+    :param url: URL
+    :return: ID as a string
     """
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
@@ -88,12 +88,14 @@ def get_cloudinary_image_transformation(
     elif transformation_type == "effect":
         transformation.update({"effect": effect})
     elif transformation_type == "overlay":
-        overlay_public_id = overlay_image_url.split("/")[-1].split(".")[0]
+        overlay_public_id = extract_id_from_url(overlay_image_url)
         transformation.update({"overlay": overlay_public_id})
     elif transformation_type == "face_detect":
         transformation.update(
             {"width": width, "height": height, "crop": "thumb", "gravity": "face"}
         )
+    else:
+        raise KeyError
     return cloudinary.CloudinaryImage(get_cloudinary_public_id(user)).build_url(
         transformation=transformation
     )

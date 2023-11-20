@@ -2,7 +2,7 @@ import sys
 import os
 import unittest
 import asyncio
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 from fastapi import UploadFile, status
 from src.routes.images import create_image
 from src.models.image import Image
@@ -15,9 +15,7 @@ class TestCreateImage(unittest.TestCase):
     @patch("tests.images.conftest.cloudinary.config")
     @patch("cloudinary.uploader.upload")
     @patch("cloudinary.CloudinaryImage")
-    def test_create_image(
-        self, mock_cloudinary_image, mock_upload, mock_config
-    ):
+    def test_create_image(self, mock_cloudinary_image, mock_upload, mock_config):
         # Mocking file upload
         mock_file = MagicMock(spec=UploadFile)
         mock_file.filename = "test_image.jpg"
@@ -90,6 +88,152 @@ def test_update_image(client, user, monkeypatch, mock_redis):
     assert updated_data["id"] == image_id_to_update
 
 
+@patch("src.utils.image_utils.get_cloudinary_image_transformation")
+def test_transform_image(mock_cloudinary_transformation, mock_redis, client, user):
+    # Setup the mock return value
+    mock_cloudinary_transformation.return_value = (
+        "https://example.com/transformed_image.jpg"
+    )
+    # Authenticate user and get token
+    login_response = client.post(
+        "/api/auth/login",
+        data={"username": user["email"], "password": user["password"]},
+    )
+    assert login_response.status_code == 200, login_response.text
+    login_data = login_response.json()
+    user_token = login_data["access_token"]
+
+    # Prepare transformation data
+    image_data = {
+        "image_url": "https://example.com/waifu.jpg",
+        "transformation_type": "resize",
+        "width": 100,
+        "height": 100,
+    }
+
+    # Send request to transform image
+    response = client.post(
+        "/api/images/transform_image/",
+        params={
+            "image_url": image_data["image_url"],
+            "transformation_type": image_data["transformation_type"],
+            "width": image_data["width"],
+            "height": image_data["height"],
+        },
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200, response.text
+    transformed_data = response.json()
+    assert transformed_data["image_url"] == image_data["image_url"]
+    assert transformed_data["image_transformed_url"] != None
+    assert transformed_data["qr_code"] != None
+
+    # Prepare transformation data
+    image_data = {
+        "image_url": "https://example.com/waifu.jpg",
+        "transformation_type": "crop",
+        "width": 100,
+        "height": 100,
+    }
+
+    # Send request to transform image
+    response = client.post(
+        "/api/images/transform_image/",
+        params={
+            "image_url": image_data["image_url"],
+            "transformation_type": image_data["transformation_type"],
+            "width": image_data["width"],
+            "height": image_data["height"],
+        },
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200, response.text
+    transformed_data = response.json()
+    assert transformed_data["image_url"] == image_data["image_url"]
+    assert transformed_data["image_transformed_url"] != None
+    assert transformed_data["qr_code"] != None
+
+    # Prepare transformation data
+    image_data = {
+        "image_url": "https://example.com/waifu.jpg",
+        "transformation_type": "effect",
+        "effect": "blur",
+    }
+
+    # Send request to transform image
+    response = client.post(
+        "/api/images/transform_image/",
+        params={
+            "image_url": image_data["image_url"],
+            "transformation_type": image_data["transformation_type"],
+            "effect": image_data["effect"],
+        },
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200, response.text
+    transformed_data = response.json()
+    assert transformed_data["image_url"] == image_data["image_url"]
+    assert transformed_data["image_transformed_url"] != None
+    assert transformed_data["qr_code"] != None
+
+    # Prepare transformation data
+    image_data = {
+        "image_url": "https://example.com/waifu.jpg",
+        "transformation_type": "overlay",
+    }
+
+    # Send request to transform image
+    response = client.post(
+        "/api/images/transform_image/",
+        params={
+            "image_url": image_data["image_url"],
+            "transformation_type": image_data["transformation_type"],
+            "overlay_public_id": "https://res.cloudinary.com/dyltcsbtk/image/upload/c_fill,h_250,w_250/v1700416105/SnapShare-API/TolbyOwl6",
+        },
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200, response.text
+    transformed_data = response.json()
+    assert transformed_data["image_url"] == image_data["image_url"]
+    assert transformed_data["image_transformed_url"] != None
+    assert transformed_data["qr_code"] != None
+
+    # Prepare transformation data
+    image_data = {
+        "image_url": "https://example.com/waifu.jpg",
+        "transformation_type": "face_detect",
+        "width": 100,
+        "height": 100,
+    }
+
+    # Send request to transform image
+    response = client.post(
+        "/api/images/transform_image/",
+        params={
+            "image_url": image_data["image_url"],
+            "transformation_type": image_data["transformation_type"],
+            "width": image_data["width"],
+            "height": image_data["height"],
+        },
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200, response.text
+    transformed_data = response.json()
+    assert transformed_data["image_url"] == image_data["image_url"]
+    assert transformed_data["image_transformed_url"] != None
+    assert transformed_data["qr_code"] != None
+
+
 def test_get_images(client, user, monkeypatch, mock_redis):
     # Authenticate the user
     login_response = client.post(
@@ -115,6 +259,29 @@ def test_get_images(client, user, monkeypatch, mock_redis):
     # For example, if you're expecting certain images to be returned for this user, you can check those
     assert isinstance(images, list)  # Check if the response is a list
     # Add more assertions as needed, based on your application's logic and requirements
+
+
+@patch("src.repository.images.get_image")
+def test_get_transform_image_url(mock_get_image, client):
+    # Mocking a transformed image
+    mock_image = Mock()
+    mock_image.image_url = "https://example.com/waifu.jpg"
+    mock_image.image_transformed_url = "https://example.com/transformed_waifu.jpg"
+    mock_image.qr_code = "Some QR Code Data"
+    mock_get_image.return_value = mock_image
+
+    # Test valid image retrieval
+    response = client.get("/api/images/transformed_image/1")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_url"] == mock_image.image_url
+    assert data["image_transformed_url"] == mock_image.image_transformed_url
+    assert data["qr_code"] != None
+
+    # Test image not found scenario
+    mock_get_image.return_value = None
+    response = client.get("/api/images/transformed_image/2")
+    assert response.status_code == 404
 
 
 def test_add_tag(client, user, monkeypatch, mock_redis):

@@ -17,6 +17,7 @@ from src.repository.images import (
     get_image,
     get_images,
     get_image_user,
+    add_transform_url_image,
 )
 
 
@@ -56,7 +57,9 @@ class Testimages(unittest.IsolatedAsyncioTestCase):
         )
 
         # Call the function under test
-        result = await create_image("http://testurl.com/image.jpg",image_data, User(id=1), self.session)
+        result = await create_image(
+            "http://testurl.com/image.jpg", image_data, User(id=1), self.session
+        )
 
         # Make assertions
         self.session.add.assert_called_once()
@@ -248,5 +251,44 @@ class Testimages(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, mock_image)
         db.query.assert_called_with(Image)
 
+    async def test_add_transform_url_image(self):
+        # Mock image object
+        mock_image = MagicMock(spec=Image)
+        mock_image.image_url = "http://testurl.com/original.jpg"
+        mock_image.user_id = self.user.id
+
+        # Mock database query
+        self.session.query.return_value.filter.return_value.first.return_value = (
+            mock_image
+        )
+
+        # Call the function under test
+        transform_url = "http://testurl.com/transformed.jpg"
+        result = await add_transform_url_image(
+            mock_image.image_url, transform_url, self.user, self.session
+        )
+
+        # Make assertions
+        self.assertEqual(result.image_transformed_url, transform_url)
+        self.session.add.assert_called_once_with(mock_image)
+        self.session.commit.assert_called_once()
+        self.session.refresh.assert_called_once_with(mock_image)
+
+    async def test_add_transform_url_image_image_not_found(self):
+        # Set up the database query to return None (image not found)
+        self.session.query.return_value.filter.return_value.first.return_value = None
+
+        # Call the function with an image URL that doesn't exist in the database
+        nonexistent_image_url = "http://testurl.com/nonexistent.jpg"
+        transform_url = "http://testurl.com/transformed.jpg"
+        result = await add_transform_url_image(
+            nonexistent_image_url, transform_url, self.user, self.session
+        )
+
+        # Make assertions
+        self.assertIsNone(result)  # Assert that the result is None
+        self.session.add.assert_not_called()  # Database add should not be called
+        self.session.commit.assert_not_called()  # Database commit should not be called
+        self.session.refresh.assert_not_called()  # Database refresh should not be called
 if __name__ == "__main__":
     unittest.main()

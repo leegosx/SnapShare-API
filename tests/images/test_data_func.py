@@ -46,7 +46,9 @@ def create_test_user_and_test_image(db):
         image_url=test_image["image_url"],
         content=test_image["content"],
         user_id=user.id,
+        image_transformed_url="https://example.com/transformed_waifu.jpg",
     )
+    db.add(image)
     return user
 
 
