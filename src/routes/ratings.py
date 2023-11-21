@@ -105,5 +105,5 @@ async def add_rating(body: RatingRequest, image_id: int, db: Session = Depends(g
     if body.rating not in range(1, 6):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Rating must be between 1 and 5")
     rating = repository_ratings.add_rating(body, image_id, current_user.id, db)
-    repository_images.average_rating(image_id, db)
+    await repository_images.average_rating(image_id, db)
     return await rating
