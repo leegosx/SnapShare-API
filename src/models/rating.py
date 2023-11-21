@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from src.database.db import engine
 from src.models.base import BaseModel
 from src.models.user import User
-from src.models.image import Image
+
 
 
 class Rating(BaseModel):

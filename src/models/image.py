@@ -2,6 +2,7 @@ from sqlalchemy import Table, Column, String, ForeignKey, Integer, DateTime, fun
 from sqlalchemy.orm import relationship
 
 from src.models.base import BaseModel, Base
+from src.models.rating import Rating
 
 image_m2m_tags = Table(
     "image_m2m_tags",

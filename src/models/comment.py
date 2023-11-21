@@ -3,6 +3,7 @@ from sqlalchemy.sql.sqltypes import DateTime
 from sqlalchemy.orm import relationship
 
 from src.models.base import BaseModel
+from src.models.image import Image
 
 class Comment(BaseModel):
     __tablename__ = "comments"

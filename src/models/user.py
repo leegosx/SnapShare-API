@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, Boolean, Integer
 from sqlalchemy.orm import relationship
 
 from src.models.base import BaseModel
-from src.models.comment import Comment
+
 
 
 class UserRole(str, enum.Enum):
