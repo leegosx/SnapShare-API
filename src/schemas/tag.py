@@ -5,7 +5,6 @@ from typing import ClassVar
 class TagRequest(BaseModel):
     name: str
 
-
 class TagResponse(BaseModel):
     id: int
     tag: str
