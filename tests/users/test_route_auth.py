@@ -186,8 +186,8 @@ def test_confirmed_email_is_already_confirmed(client, user, monkeypatch):
 
     token_verification = auth_service.create_email_token(
         {"sub": user.get('email')})
-    response = client.get(f"/api/auth/confirmed_email?token={token_verification}",
-                          headers={"Authorization": f"Bearer {token_verification}"})
+    response = client.get(f"/api/auth/confirmed_email/{token_verification}", headers={"Authorization": f"Bearer {token_verification}"})
+
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["message"] == "Your email is already confirmed"
@@ -218,8 +218,8 @@ def test_confirmed_email_bad_request(client, user, session, monkeypatch):
 
     token_verification = auth_service.create_email_token(
         {"sub": 'AAA' + user.get('email')})
-    response = client.get(f"/api/auth/confirmed_email?token={token_verification}",
-                          headers={"Authorization": f"Bearer {token_verification}"})
+    response = client.get(f"/api/auth/confirmed_email/{token_verification}", headers={"Authorization": f"Bearer {token_verification}"})
+
     assert response.status_code == 400, response.text
     data = response.json()
     assert data["detail"] == "Verification error"
@@ -242,8 +242,8 @@ def test_confirmed_email_confirmed(client, user, monkeypatch):
 
     token_verification = auth_service.create_email_token(
         {"sub": user.get('email')})
-    response = client.get(f"/api/auth/confirmed_email?token={token_verification}",
-                          headers={"Authorization": f"Bearer {token_verification}"})
+    response = client.get(f"/api/auth/confirmed_email/{token_verification}", headers={"Authorization": f"Bearer {token_verification}"})
+
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["message"] == "Email confirmed"

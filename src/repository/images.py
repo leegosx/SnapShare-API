@@ -204,3 +204,27 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
         )
         .first()
     )
+
+
+async def average_rating(image_id: int, db: Session):
+    """
+    The average_rating function takes an image_id and a database session as arguments.
+    It then queries the database for the image with that id, and if it exists, it gets all of its ratings.
+    If there are any ratings, it calculates their average score and sets that as the rating attribute of 
+    the Image object in question. It then commits this change to the database.
+    
+    :param image_id: int: Specify the image id for which we want to get the average rating
+    :param db: Session: Pass the database session to the function
+    :return: The average rating of an image
+    """
+    image = db.query(Image).filter(Image.id == image_id).first()
+    if image:
+        ratings = await get_ratings(db, image_id=image_id)
+        rating_avg = 0
+        if len(ratings):
+            n_ratings = [r.rating_score for r in ratings]
+            rating_avg = float(sum(n_ratings)) / len(n_ratings)
+        image.rating = rating_avg
+        db.commit()
+        db.refresh(image)
+    return rating_avg
