@@ -21,6 +21,8 @@ from src.repository.users import (
     update_avatar,
     update_user,
     change_password,
+    to_ban_user,
+    check_ban_status,
 )
 
 
@@ -108,6 +110,36 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.username, "UpdatedUser")
         self.assertEqual(result.email, "updated@test.com")
         self.assertEqual(result.password, "newpassword")
+
+    async def test_to_ban_user(self):
+        """
+        The test_to_ban_user function tests the to_ban_user function in the user.py file.
+        The test is successful if a user's ban status is changed from False to True.
+
+        :param self: Access the attributes and methods of a class
+        :return: True if the user is banned
+        :doc-author: Trelent
+        """
+        body = UserBase(
+            username="Kiril",
+            email="kiril@test.com",
+            password="test_password", )
+
+        result = await to_ban_user(body=body, email=body.email, db=self.session)
+        self.assertTrue(result.ban_status)
+
+    async def test_check_ban_status(self):
+        """
+        The test_check_ban_status function tests the check_ban_status function in the user.py file.
+        The test checks to see if a user is banned or not, and returns True if they are.
+
+        :param self: Access the class attributes and methods
+        :return: True if the user is banned and false if not
+        :doc-author: Trelent
+        """
+        user = self.user
+        result = await check_ban_status(username=user.username, db=self.session)
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":
