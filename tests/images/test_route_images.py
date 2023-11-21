@@ -3,7 +3,7 @@ import os
 import unittest
 import asyncio
 from unittest.mock import patch, MagicMock, Mock
-from fastapi import UploadFile, status
+from fastapi import UploadFile, HTTPException
 from src.routes.images import create_image
 from src.models.image import Image
 
@@ -51,6 +51,36 @@ class TestCreateImage(unittest.TestCase):
         )
         mock_cloudinary_image.assert_called_once_with("SnapShare-API/testuser123")
 
+    @patch("tests.images.conftest.cloudinary.config")
+    @patch("cloudinary.uploader.upload")
+    @patch("cloudinary.CloudinaryImage")
+    def test_create_image_with_too_many_tags(self, mock_cloudinary_image, mock_upload, mock_config):
+        # Mocking file upload
+        mock_file = MagicMock(spec=UploadFile)
+        mock_file.filename = "test_image.jpg"
+        mock_file.file = MagicMock()
+
+        # Mocking user and database session
+        mock_user = MagicMock()
+        mock_user.username = "testuser"
+        mock_user.id = "123"
+        mock_db = MagicMock()
+
+        # Mocking ImageCreate with too many tags
+        mock_image_create = MagicMock()
+        mock_image_create.tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6']  # More than 5 tags
+
+        # Assert that HTTPException is raised
+        with self.assertRaises(HTTPException) as context:
+            asyncio.run(
+                create_image(
+                    file=mock_file, body=mock_image_create, user=mock_user, db=mock_db
+                )
+            )
+
+        # Check if the correct exception is raised
+        self.assertEqual(context.exception.status_code, 400)
+        self.assertEqual(context.exception.detail, "Maximum number of tags is 5")
 
 def test_update_image(client, user, monkeypatch, mock_redis):
     # Authenticate the user

@@ -13,6 +13,7 @@ from src.utils.image_utils import (
     get_cloudinary_image_transformation,
 )
 from src.services.auth_service import auth_service
+import logging
 
 
 router = APIRouter(prefix="/images", tags=["images"])
@@ -28,31 +29,51 @@ async def create_image(
     db: Session = Depends(get_db),
 ):
     """
-    The create_image function creates a new image for the user.
-        The function takes in an ImageCreate object, which is used to create the image.
-        It also takes in a file, which is uploaded to Cloudinary and then stored as an avatar_url on the database.
-        Finally it takes in a User object and Session object from Depends().
+    Creates a new image for the user.
 
-    :param body: ImageCreate: Create a new image in the database
-    :param file: UploadFile: Upload the image to cloudinary
-    :param user: User: Get the user from the database
-    :param db: Session: Create a connection to the database
-    :param : Get the current user from the database
-    :return: The created image object
-    :doc-author: Trelent
+    The function first checks if the number of tags in the request does not exceed the maximum limit (5).
+    It then uploads the provided image file to Cloudinary and creates a new image record in the database.
+
+    Args:
+        file (UploadFile): The image file to be uploaded.
+        body (ImageCreate): Object containing image details, including tags.
+        user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        ImageResponse: The created image object.
+
+    Raises:
+        HTTPException: If the number of tags exceeds the limit or if the image could not be created.
     """
+    # Check for the number of tags
+    tag_list = body.tags[0].split(",")  # Split the string into a list
+    body.tags = tag_list
     if len(body.tags) > 5:
+        logging.warning(f"User {user.id} tried to upload image with too many tags.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Maximum number of tags is 5",
         )
-    image_url = post_cloudinary_image(file, user)
-    images = await repository_images.create_image(image_url, body, user, db)
-    if images is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Image not created"
-        )
-    return images
+
+    try:
+        # Upload the image to Cloudinary
+        image_url = post_cloudinary_image(file, user)
+
+        # Create the image in the database
+        images = await repository_images.create_image(image_url, body, user, db)
+        if images is None:
+            logging.error(f"Image creation failed for user {user.id}.")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Image not created"
+            )
+
+        return images
+
+    except Exception as e:
+        logging.error(f"Error in image creation for user {user.id}: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
@@ -296,7 +317,8 @@ async def get_transform_image_url(
         )
     if image.image_transformed_url is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image was not transformed, please transform first."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Image was not transformed, please transform first.",
         )
 
     qr_code = create_qr_code_from_url(image.image_transformed_url)
