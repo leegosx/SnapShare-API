@@ -5,43 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb9716f5-9771-424b-9be2-2353aa5be834" name="Changes" comment="uncomment .idea/">
-      <change beforePath="$PROJECT_DIR$/.idea/SnapShare-API.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SnapShare-API.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/00353fc5127d_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/1b9e40521fcd_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/3144409c7459_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/344190884b0b_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/345e98dd0ff9_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/3e8d79d49f51_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/598fdb28f2ae_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/5e4df12a1bf1_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/64acdff0bbd2_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/97e96edc1e33_.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/a54d54717efa_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/be177e22a6b4_initial_tabels.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/e92c0da0f49c_initial_tables.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/fd72d5f99893_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/conf/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/conf/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/photo.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/photo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repository/comments.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repository/photos.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repository/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/users.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/auth_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/email_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/email_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/photo_service.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_route_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_route_auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_unit_repository_users.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_unit_repository_users.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
