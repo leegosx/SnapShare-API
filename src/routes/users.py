@@ -20,8 +20,8 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/me/", response_model=UserInfo)
 async def read_users_me(
-    current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The read_users_me function returns the current user's information.
@@ -50,9 +50,9 @@ async def read_users_me(
 
 @router.patch("/avatar", response_model=UserInfo)
 async def update_avatar_user(
-    file: UploadFile = File(),
-    current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        file: UploadFile = File(),
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The update_avatar_user function updates the avatar of a user.
@@ -118,9 +118,9 @@ async def get_user_profile(username: str, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
 )
 async def change_username(
-    body: Username,
-    user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        body: Username,
+        user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The change_username function takes in a Username object and returns a User object.
@@ -145,25 +145,26 @@ async def change_username(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken"
         )
     user.username = body.username
-    user = await repository_users.update_user(auth_service.redis ,user, db)
+    user = await repository_users.update_user(auth_service.redis, user, db)
     return user
 
-# @router.patch('/ban_user')
-# async def ban_user(email: str = Form(), db: Session = Depends(get_db)):
-#     """
-#     The ban_user function is used to ban a user by email.
-#         The function takes an email as input and returns the banned user's details.
 
-#     :param email: str: Get the email of a user from the request body
-#     :param db: Session: Get the database session
-#     :return: A dictionary with the user and detail
-#     :doc-author: Trelent
-#     """
-#     user = await repository_users.get_user_by_email(email, db)
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="Such user is not found",
-#         )
-#     user = await repository_users.to_ban_user(user, email, db)
-#     return {"user": user, "detail": "User was banned"}
+@router.patch('/ban_user')
+async def ban_user(email: str, db: Session = Depends(get_db)):
+    """
+    The ban_user function is used to ban a user by email.
+        The function takes an email as input and returns the banned user's details.
+
+    :param email: str: Get the email of a user from the request body
+    :param db: Session: Get the database session
+    :return: A dictionary with the user and detail
+    :doc-author: Trelent
+    """
+    user = await repository_users.get_user_by_email(email, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Such user is not found",
+        )
+    user = await repository_users.to_ban_user(user, email, db)
+    return {"detail": "User was banned"}
