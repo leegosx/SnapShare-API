@@ -54,6 +54,11 @@ class UserInfo(BaseModel):
     avatar: str
     role: str
     
+class UserUpdateAvatar(BaseModel):
+    username: str
+    avatar: str
+    detail: str = "Avatar successfully changed!"
+
 class Username(BaseModel):
     username: str
     
