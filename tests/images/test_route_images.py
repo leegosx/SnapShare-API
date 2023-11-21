@@ -54,7 +54,9 @@ class TestCreateImage(unittest.TestCase):
     @patch("tests.images.conftest.cloudinary.config")
     @patch("cloudinary.uploader.upload")
     @patch("cloudinary.CloudinaryImage")
-    def test_create_image_with_too_many_tags(self, mock_cloudinary_image, mock_upload, mock_config):
+    async def test_create_image_with_too_many_tags(
+        self, mock_cloudinary_image, mock_upload, mock_config
+    ):
         # Mocking file upload
         mock_file = MagicMock(spec=UploadFile)
         mock_file.filename = "test_image.jpg"
@@ -68,17 +70,12 @@ class TestCreateImage(unittest.TestCase):
 
         # Mocking ImageCreate with too many tags
         mock_image_create = MagicMock()
-        mock_image_create.tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6']  # More than 5 tags
-
-        # Assert that HTTPException is raised
-        with self.assertRaises(HTTPException) as context:
-            asyncio.run(
-                create_image(
-                    file=mock_file, body=mock_image_create, user=mock_user, db=mock_db
-                )
-            )
+        mock_image_create.tags = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"]  # More than 5 tags
 
         # Check if the correct exception is raised
+        with self.assertRaises(HTTPException) as context:
+            await create_image(file=mock_file, body=mock_image_create, user=mock_user, db=mock_db)
+
         self.assertEqual(context.exception.status_code, 400)
         self.assertEqual(context.exception.detail, "Maximum number of tags is 5")
 
