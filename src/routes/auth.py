@@ -255,7 +255,7 @@ async def forgot_password(
     db.commit()
 
     return {
-        "message": f"Reset password token has been sent to your e-email.{reset_password_token}"
+        "message": f"Reset password token has been sent to your e-email: {user.email}"
     }
 
 
