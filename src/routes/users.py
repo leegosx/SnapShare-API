@@ -10,7 +10,7 @@ import cloudinary.uploader
 
 from src.database.db import get_db
 from src.models.user import User
-from src.schemas.user import UserDb, UserInfo, UserProfile, Username, UsernameResonpose
+from src.schemas.user import UserDb, UserInfo, UserProfile, Username, UsernameResonpose, UserUpdateAvatar
 from src.repository import users as repository_users
 from src.services.auth_service import auth_service
 from src.conf.config import settings
@@ -48,7 +48,7 @@ async def read_users_me(
     return user_me_info_response
 
 
-@router.patch("/avatar", response_model=UserInfo)
+@router.patch("/avatar", response_model=UserUpdateAvatar)
 async def update_avatar_user(
     file: UploadFile = File(),
     current_user: User = Depends(auth_service.get_current_user),
