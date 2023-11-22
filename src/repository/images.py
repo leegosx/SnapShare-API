@@ -248,4 +248,5 @@ async def search_image_by_tag(search_by: str, filter_by: str, db: Session):
         result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.ratings).all()
     else:
         result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).all()
+
     return result
