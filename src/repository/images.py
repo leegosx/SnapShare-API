@@ -1,8 +1,9 @@
-from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, or_, nulls_last
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from src.models.image import Image, Tag
+from src.models.rating import Rating
 from src.models.user import User
 from src.schemas.image import ImageCreate, ImageUpdate
 from src.repository.ratings import get_ratings
@@ -235,18 +236,30 @@ async def search_image_by_keyword(search_by: str, filter_by: str, db: Session):
     if filter_by == "created_at":
         result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.created_at).all()
     elif filter_by == "rating":
-        result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.ratings).all()
-    else:
-        result = db.query(Image).filter(Image.content == search_by).all()
+        result = (
+            db.query(Image)
+            .join(Image.ratings)
+            .filter(Image.content.like(search_by))
+            .options(joinedload(Image.ratings))
+            .order_by(nulls_last(Rating.rating_score))
+            .all()
+        )
     return result
 
 
 async def search_image_by_tag(search_by: str, filter_by: str, db: Session):
+
     if filter_by == "created_at":
         result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.created_at).all()
-    elif filter_by == "rating":
-        result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.ratings).all()
-    else:
-        result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).all()
 
+    elif filter_by == "rating":
+        result = (
+            db.query(Image)
+            .join(Image.ratings)
+            .join(Image.tags)
+            .filter(Tag.name == search_by)
+            .options(joinedload(Image.ratings))
+            .order_by(nulls_last(Rating.rating_score)).all()
+        )
     return result
+

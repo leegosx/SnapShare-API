@@ -8,6 +8,7 @@ from src.models.image import Tag
 from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate, ImageURLResponse, ImageSearch
 from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
+from src.repository import search as repository_search
 from src.utils.qr_code import create_qr_code_from_url
 from src.utils.image_utils import (
     post_cloudinary_image,
@@ -329,46 +330,4 @@ async def get_transform_image_url(
     }
 
 
-@router.get("/search_by_keyword/", name="Search images by keyword", response_model=List[ImageSearch])
-async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
-                                  db: Session = Depends(get_db)):
-    if search_by is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Not found image"
-        )
-    elif filter_by is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not have rating"
-        )
-    elif search_by:
-        image = await repository_images.search_image_by_keyword(search_by, filter_by, db)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Images by keyword not found"
-        )
-
-    return image
-
-
-@router.get("/search_by_tag/", name="Search images by tag", response_model=List[ImageSearch])
-async def search_image_by_tag(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
-                              db: Session = Depends(get_db)):
-
-    if search_by is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Not found tag"
-        )
-    elif filter_by is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not have rating with this tag"
-        )
-
-    if search_by:
-        image = await repository_images.search_image_by_tag(search_by, filter_by, db)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Images by tag not found"
-        )
-
-    return image
 
