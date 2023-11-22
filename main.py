@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
-from src.routes import images,auth,users, tags, comments
+from src.routes import images, auth, users, tags, comments
 from src.routes import ratings
 
 app = FastAPI()
@@ -16,6 +16,7 @@ app.include_router(comments.router, prefix='/api')
 app.include_router(tags.router, prefix='/api')
 app.include_router(ratings.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
+
 
 @app.get("/", name="Корінь проекту")
 def read_root():
@@ -51,7 +52,5 @@ def healthchecher(db: Session = Depends(get_db)):
                             detail="Error connecting to the database")
 
 
-
-
 if __name__ == '__main__':
-    uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8001)
+    uvicorn.run(app="main:app", reload=True, host="127.0.0.1", port=8000)

@@ -1,5 +1,6 @@
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
+from typing import List
 
 from src.models.image import Image, Tag
 from src.models.user import User
@@ -230,7 +231,7 @@ async def average_rating(image_id: int, db: Session):
     return rating_avg
 
 
-async def search_image_by_keyword(search_by: str, filter_by: str, db: Session):
+async def search_image_by_keyword(search_by: str, filter_by: str, db: Session) -> List[Image]:
     if filter_by == "created_at":
         result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.created_at).all()
     elif filter_by == "rating":
@@ -240,7 +241,7 @@ async def search_image_by_keyword(search_by: str, filter_by: str, db: Session):
     return result
 
 
-async def search_image_by_tag(search_by: str, filter_by: str, db: Session):
+async def search_image_by_tag(search_by: str, filter_by: str, db: Session) -> List[Image]:
     if filter_by == "created_at":
         result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.created_at).all()
     elif filter_by == "rating":

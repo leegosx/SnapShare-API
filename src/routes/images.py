@@ -329,9 +329,9 @@ async def get_transform_image_url(
     }
 
 
-@router.get("/search_by_keyword/", name="Search images by keyword", response_model=List[{ImageSearch}])
-async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
-                                  current_user=Depends(get_db), db: Session = Depends(get_db)):
+@router.get("/search_by_keyword/", name="Search images by keyword", response_model=List[ImageSearch])
+async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, values=["rating", "created_at"]),
+                                  db: Session = Depends(get_db)):
     if search_by:
         image = await repository_images.search_image_by_keyword(search_by, filter_by, db)
     else:
@@ -342,9 +342,9 @@ async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, e
     return image
 
 
-@router.get("/search_by_tag/", name="Search images by tag", response_model=List[{ImageSearch}])
-async def search_image_by_tag(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
-                              current_user=Depends(get_db), db: Session = Depends(get_db)):
+@router.get("/search_by_tag/", name="Search images by tag", response_model=List[ImageSearch])
+async def search_image_by_tag(search_by: str, filter_by: str = Query(None, values=["rating", "created_at"]),
+                              db: Session = Depends(get_db)):
     if search_by:
         image = await repository_images.search_image_by_tag(search_by, filter_by, db)
     else:
