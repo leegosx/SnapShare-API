@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query
 from sqlalchemy.orm import Session
+from typing import List
 
 from src.database.db import get_db
 from src.models.user import User
 from src.models.image import Tag
-from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate, ImageURLResponse
+from src.schemas.image import ImageCreate, ImageResponse, ImageUpdate, ImageURLResponse, ImageSearch
 from src.schemas.tag import TagResponse
 from src.repository import images as repository_images
 from src.utils.qr_code import create_qr_code_from_url
@@ -15,7 +16,6 @@ from src.utils.image_utils import (
 from src.services.auth_service import auth_service
 import logging
 
-
 router = APIRouter(prefix="/images", tags=["images"])
 
 
@@ -23,10 +23,10 @@ router = APIRouter(prefix="/images", tags=["images"])
     "/create_new", response_model=ImageResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_image(
-    file: UploadFile = File(...),
-    body: ImageCreate = Depends(),
-    user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        file: UploadFile = File(...),
+        body: ImageCreate = Depends(),
+        user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     Creates a new image for the user.
@@ -77,10 +77,10 @@ async def create_image(
 
 @router.put("/{image_id}", response_model=ImageResponse)
 async def update_image(
-    image_id,
-    body: ImageUpdate,
-    current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        image_id,
+        body: ImageUpdate,
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The update_image function updates an image in the database.
@@ -107,9 +107,9 @@ async def update_image(
 
 @router.delete("/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_image(
-    image_id: str,
-    current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        image_id: str,
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The delete_image function deletes an image from the database.
@@ -155,10 +155,10 @@ async def get_image(image_id: str, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=list())
 async def get_images(
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db),
+        skip: int = 0,
+        limit: int = 100,
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db),
 ):
     """
     The get_images function returns a list of images.
@@ -191,9 +191,9 @@ async def get_images(
     summary="Add tags to a image",
 )
 async def add_tag(
-    body: TagResponse,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
+        body: TagResponse,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(auth_service.get_current_user),
 ):
     """
     The add_tag function adds a tag to an image.
@@ -237,17 +237,17 @@ async def add_tag(
 
 @router.post("/transform_image/", response_model=ImageURLResponse)
 async def transform_image(
-    image_url: str,
-    transformation_type: str = Query(
-        ...,
-        description="Type of transformation: resize, crop, effect, overlay, face_detect",
-    ),
-    width: int = None,
-    height: int = None,
-    effect: str = None,
-    overlay_image_url: str = None,
-    db: Session = Depends(get_db),
-    user: User = Depends(auth_service.get_current_user),
+        image_url: str,
+        transformation_type: str = Query(
+            ...,
+            description="Type of transformation: resize, crop, effect, overlay, face_detect",
+        ),
+        width: int = None,
+        height: int = None,
+        effect: str = None,
+        overlay_image_url: str = None,
+        db: Session = Depends(get_db),
+        user: User = Depends(auth_service.get_current_user),
 ):
     """
     The transform_image function takes an image_url, transformation_type, width, height, effect and overlay_image_url as parameters.
@@ -296,8 +296,8 @@ async def transform_image(
 
 @router.get("/transformed_image/{image_id}", response_model=ImageURLResponse)
 async def get_transform_image_url(
-    image_id: str,
-    db: Session = Depends(get_db),
+        image_id: str,
+        db: Session = Depends(get_db),
 ):
     """
     The get_transform_image_url function returns the transformed image URL and a QR code for that URL.
@@ -327,3 +327,29 @@ async def get_transform_image_url(
         "image_transformed_url": image.image_transformed_url,
         "qr_code": qr_code,
     }
+
+
+@router.get("/search_by_keyword/", name="Search images by keyword", response_model=List[{ImageSearch}])
+async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
+                                  current_user=Depends(get_db), db: Session = Depends(get_db)):
+    if search_by:
+        image = await repository_images.search_image_by_keyword(search_by, filter_by, db)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Images by keyword not found"
+        )
+
+    return image
+
+
+@router.get("/search_by_tag/", name="Search images by tag", response_model=List[{ImageSearch}])
+async def search_image_by_tag(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
+                              current_user=Depends(get_db), db: Session = Depends(get_db)):
+    if search_by:
+        image = await repository_images.search_image_by_tag(search_by, filter_by, db)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Images by tag not found"
+        )
+
+    return image

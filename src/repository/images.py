@@ -8,7 +8,7 @@ from src.repository.ratings import get_ratings
 
 
 async def create_image(
-    image_url: str, image_data: ImageCreate, current_user: User, db: Session
+        image_url: str, image_data: ImageCreate, current_user: User, db: Session
 ):
     """
     The create_image function creates a new image in the database.
@@ -42,7 +42,7 @@ async def create_image(
 
 
 async def add_transform_url_image(
-    image_url: str, transform_url: ImageCreate, current_user: User, db: Session
+        image_url: str, transform_url: ImageCreate, current_user: User, db: Session
 ):
     """
     The add_transform_url_image function takes in an image_url, a transform_url, and the current user.
@@ -75,7 +75,7 @@ async def add_transform_url_image(
 
 
 async def update_image(
-    image_id, image_data: ImageUpdate, current_user: User, db: Session
+        image_id, image_data: ImageUpdate, current_user: User, db: Session
 ):
     """
     The update_image function updates an image in the database.
@@ -228,3 +228,23 @@ async def average_rating(image_id: int, db: Session):
         db.commit()
         db.refresh(image)
     return rating_avg
+
+
+async def search_image_by_keyword(search_by: str, filter_by: str, db: Session):
+    if filter_by == "created_at":
+        result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.created_at).all()
+    elif filter_by == "rating":
+        result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.ratings).all()
+    else:
+        result = db.query(Image).filter(Image.content == search_by).all()
+    return result
+
+
+async def search_image_by_tag(search_by: str, filter_by: str, db: Session):
+    if filter_by == "created_at":
+        result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.created_at).all()
+    elif filter_by == "rating":
+        result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.ratings).all()
+    else:
+        result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).all()
+    return result
