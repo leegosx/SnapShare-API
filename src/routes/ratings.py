@@ -6,7 +6,7 @@ import cloudinary.uploader
 
 from src.database.db import get_db
 from src.models.user import User, UserRole
-from src.schemas.rating import RatingRequest, RatingResponse, ImageRatingsResponse
+from src.schemas.rating import RatingRequest, RatingResponse, ImageRatingsResponse, AllRatingResponse
 from src.repository import images as repository_images
 from src.repository import ratings as repository_ratings
 from src.services.auth_service import auth_service
@@ -45,6 +45,21 @@ async def get_by_photo_ratings(image_id: int, db: Session = Depends(get_db)):
         for rating in ratings
     ]
     return rating_responses
+
+@router.get("/all", response_model=List[AllRatingResponse], 
+            dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
+async def get_ratings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """
+    The get_ratings function returns all ratings in the database.
+        The function takes no input and returns a list of rating objects.
+
+    :param db: Session: Pass the database session to the function
+    :return: A list of ratings
+    """
+    ratings = await repository_ratings.get_all_ratings(skip, limit, db)
+    if not ratings:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No ratings found")
+    return ratings
 
 @router.get("/get/{rating_id}/", response_model=RatingResponse, 
             dependencies=[Depends(roles.Roles(["admin", "moderator"]))])

@@ -15,3 +15,10 @@ class ImageRatingsResponse(BaseModel):
     user_id: int
     image_id: int
     average_rating: float
+    
+class AllRatingResponse(BaseModel):
+    id: int
+    user_id: int
+    image_id: int
+    rating_score: int
+    

@@ -13,6 +13,7 @@ from src.models.rating import Rating
 from src.models.image import Image
 from src.models.user import User
 from src.repository.ratings import (
+    get_all_ratings,
     get_rating,
     get_ratings,
     add_rating,
@@ -76,6 +77,23 @@ class TestAsync(unittest.IsolatedAsyncioTestCase):
         self.session.delete.assert_called_once_with(rating_to_remove)
         self.session.commit.assert_called_once()
         self.assertEqual(result, rating_to_remove)
+
+    async def test_get_all_ratings(self):
+        # Підготовка тестових даних
+        offset = 0
+        limit = 10
+        expected_ratings = [MagicMock(spec=Rating), MagicMock(spec=Rating)]
+
+        # Налаштування поведінки мока
+        self.session.execute.return_value.scalars.return_value.all.return_value = expected_ratings
+
+        # Виклик функції
+        ratings = await get_all_ratings(offset, limit, self.session)
+
+        # Перевірка результату
+        self.assertEqual(ratings, expected_ratings)
+        # Тут можна також додати перевірку виклику з вірними параметрами, якщо потрібно
+
     
 if __name__ == '__main__':
     print(TestAsync.setUp)

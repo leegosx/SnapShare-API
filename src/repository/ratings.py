@@ -1,5 +1,6 @@
 from typing import List
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.models.rating import Rating
@@ -27,6 +28,22 @@ async def get_ratings(db: Session, image_id: int = 0, user_id: int = 0) -> List[
         ratings = db.query(Rating).all()
 
     return ratings
+
+
+async def get_all_ratings(offset: int, limit: int, db: Session) -> Rating:
+    """
+    The get_all_ratings function returns all ratings in the database.
+        
+    
+    :param rating_id: int: Filter the query by id
+    :param db: Session: Pass in the database session
+    :return: A list of rating objects
+    :doc-author: Trelent
+    """
+    sq = select(Rating).offset(offset).limit(limit)
+    ratings = db.execute(sq)
+    return ratings.scalars().all()
+
 
 async def get_rating(rating_id: int, db: Session) -> Rating:
     """
