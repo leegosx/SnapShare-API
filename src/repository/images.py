@@ -231,7 +231,7 @@ async def average_rating(image_id: int, db: Session):
     return rating_avg
 
 
-async def search_image_by_keyword(search_by: str, filter_by: str, db: Session) -> List[Image]:
+async def search_image_by_keyword(search_by: str, filter_by: str, db: Session):
     if filter_by == "created_at":
         result = db.query(Image).filter(Image.content.like(search_by)).order_by(Image.created_at).all()
     elif filter_by == "rating":
@@ -241,7 +241,7 @@ async def search_image_by_keyword(search_by: str, filter_by: str, db: Session) -
     return result
 
 
-async def search_image_by_tag(search_by: str, filter_by: str, db: Session) -> List[Image]:
+async def search_image_by_tag(search_by: str, filter_by: str, db: Session):
     if filter_by == "created_at":
         result = db.query(Image).join(Image.tags).filter(Tag.name == search_by).order_by(Image.created_at).all()
     elif filter_by == "rating":

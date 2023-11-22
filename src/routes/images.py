@@ -330,20 +330,24 @@ async def get_transform_image_url(
 
 
 @router.get("/search_by_keyword/", name="Search images by keyword", response_model=List[ImageSearch])
-async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, values=["rating", "created_at"]),
+async def search_image_by_keyword(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
                                   db: Session = Depends(get_db)):
-    if search_by:
+    if search_by and filter_by is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Some images don`t have rating"
+        )
+    elif search_by:
         image = await repository_images.search_image_by_keyword(search_by, filter_by, db)
     else:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Images by keyword not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Images by keyword not found"
         )
 
     return image
 
 
 @router.get("/search_by_tag/", name="Search images by tag", response_model=List[ImageSearch])
-async def search_image_by_tag(search_by: str, filter_by: str = Query(None, values=["rating", "created_at"]),
+async def search_image_by_tag(search_by: str, filter_by: str = Query(None, enum=["rating", "created_at"]),
                               db: Session = Depends(get_db)):
     if search_by:
         image = await repository_images.search_image_by_tag(search_by, filter_by, db)
