@@ -17,6 +17,8 @@ app.include_router(tags.router, prefix='/api')
 app.include_router(ratings.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
 
+app.include_router(search_filter.router, prefix='/api')
+
 @app.get("/", name="Корінь проекту")
 def read_root():
     """
