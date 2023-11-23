@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 
 from src.database.db import get_db
-from src.routes import images, auth, users, tags, comments, search, search_filter
+from src.routes import images, auth, users, tags, comments, search_filter
 from src.routes import ratings
 
 app = FastAPI()
