@@ -46,7 +46,6 @@ async def signup(
     :param request: Request: Get the base url of the application
     :param db: Session: Get the database session
     :return: A dict with the user and a detail message
-    :doc-author: Trelent
     """
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
@@ -73,7 +72,6 @@ async def login(
     :param body: OAuth2PasswordRequestForm: Validate the request body
     :param db: Session: Get the database session from the dependency injection container
     :return: A dict with the access token and refresh token
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
@@ -130,7 +128,6 @@ async def logout(
     :param current_user: UserBase: Get the user who is logged in
     :param db: Session: Pass the database session to the function
     :return: A dictionary with the status code, detail and token
-    :doc-author: Trelent
     """
     await repository_users.save_black_list_token(token, current_user, db)
 
@@ -152,7 +149,6 @@ async def some_protected_endpoint(
     :param token: str: Get the token from the request header
     :param db: Session: Get a database session
     :return: A message if the token is not blacklisted
-    :doc-author: Trelent
     """
     if await repository_users.find_black_list_token(token, db):
         raise HTTPException(
@@ -175,7 +171,6 @@ async def refresh_token(
     :param credentials: HTTPAuthorizationCredentials: Get the refresh token from the request header
     :param db: Session: Access the database
     :return: A dictionary with the access token, refresh token and token type
-    :doc-author: Trelent
     """
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
@@ -200,17 +195,16 @@ async def refresh_token(
 async def confirmed_email(token: str, db: Session = Depends(get_db)):
     """
     The confirmed_email function is used to confirm a user's email address.
-        It takes the token from the URL and uses it to get the user's email address.
-        Then, it checks if that user exists in our database, and if they do not exist,
-        an HTTP 400 error is raised. If they do exist but their account has already been confirmed,
-        then a message saying so will be returned. Otherwise (if they are found in our database
-        and their account has not yet been confirmed), we call repository_users' confirmed_email function
-         with that email as its
+    It takes the token from the URL and uses it to get the user's email address.
+    Then, it checks if that user exists in our database, and if they do not exist,
+    an HTTP 400 error is raised. If they do exist but their account has already been confirmed,
+    then a message saying so will be returned. Otherwise (if they are found in our database
+    and their account has not yet been confirmed), we call repository_users' confirmed_email function
+    with that email as its
 
     :param token: str: Get the token from the url
     :param db: Session: Get the database session
     :return: A dictionary with the message key and value
-    :doc-author: Trelent
     """
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -237,7 +231,6 @@ async def forgot_password(
     :param background_tasks: BackgroundTasks: Add a task to the background tasks queue
     :param db: Session: Get the database session
     :return: A dict
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(email, db)
     if not user:
@@ -270,7 +263,6 @@ async def reset_password(body: ResetPasswordModel, db: Session = Depends(get_db)
     :param body: ResetPasswordModel: Get the email, reset_password_token and password from the request body
     :param db: Session: Pass the database connection to the function
     :return: A json response, which is a subclass of response
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.email, db)
     if not user:

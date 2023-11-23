@@ -53,14 +53,14 @@ async def create_comment(
     The create_comment function creates a new comment in the database.
         Args:
             body (CommentRequest): The request body containing the content of the comment.
-            user (User): The user who is creating this comment.
+            user (User): The user who is creating this comment. 
             image_id (int): The id of the image that this comment belongs to.
-            db (Session): A database session object for interacting with our SQLite3 database file, images_api/db/images-database.sqlite3 . 
+            db (Session): A session object for interacting with our database.
     
-    :param body: CommentRequest: Get the content of the comment
-    :param user: User: Get the user_id of the user who is making a comment
+    :param body: CommentRequest: Get the content of the comment from the request body
+    :param user: User: Get the user id of the comment author
     :param image_id: int: Get the image id from the database
-    :param db: Session: Pass the database session to the function
+    :param db: Session: Access the database
     :return: A comment object
     """
     comment = Comment(content=body.content, user_id=user.id, image_id=image_id)

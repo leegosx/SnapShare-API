@@ -95,7 +95,6 @@ async def update_image(
     :param db: Session: Pass the database session to the repository
     :param : Get the image id
     :return: The updated image
-    :doc-author: Trelent
     """
     image = await repository_images.update_image(image_id, body, current_user, db)
     if image is None:
@@ -123,7 +122,6 @@ async def delete_image(
     :param db: Session: Get the database session
     :param : Get the image_id from the url
     :return: An image object
-    :doc-author: Trelent
     """
     image = await repository_images.delete_image(image_id, current_user, db)
     if image is None:
@@ -143,7 +141,6 @@ async def get_image(image_id: str, db: Session = Depends(get_db)):
     :param image_id: str: Get the image id from the url
     :param db: Session: Pass the database session to the function
     :return: An image object
-    :doc-author: Trelent
     """
     image = await repository_images.get_image(image_id, db)
     if image is None:
@@ -174,7 +171,6 @@ async def get_images(
     :param db: Session: Get the database session
     :param : Skip the first n images
     :return: A list of images
-    :doc-author: Trelent
     """
     images = await repository_images.get_images(skip, limit, current_user, db)
     if images is None:
@@ -203,7 +199,6 @@ async def add_tag(
     :param current_user: User: Get the current user who is making the request
     :param : Get the image id from the body of the request
     :return: The image object
-    :doc-author: Trelent
     """
     image = await repository_images.get_image_user(
         image_id=body.image_id, db=db, current_user=current_user
@@ -270,7 +265,6 @@ async def transform_image(
     :param user: User: Get the user from the database
     :param : Determine the type of transformation to be applied on the image
     :return: A dictionary
-    :doc-author: Trelent
     """
     try:
         transformed_url = get_cloudinary_image_transformation(
@@ -308,7 +302,6 @@ async def get_transform_image_url(
     :param current_user: User: Get the current user
     :param : Get the image id from the url and then pass it to the function
     :return: The image_url, the transformed image url and the qr code for that transformed url
-    :doc-author: Trelent
     """
     image = await repository_images.get_image(image_id, db)
     if image is None:

@@ -93,7 +93,6 @@ async def remove_tag(tag_id: int, db: Session = Depends(get_db)):
     :param tag_id: int: Specify the id of the tag to be removed
     :param db: Session: Pass the database connection to the repository
     :return: A tag object
-    :doc-author: Trelent
     """
 
     tag = await repository_tags.remove_tag(tag_id, db)

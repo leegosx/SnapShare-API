@@ -38,7 +38,6 @@ async def get_all_ratings(offset: int, limit: int, db: Session) -> Rating:
     :param rating_id: int: Filter the query by id
     :param db: Session: Pass in the database session
     :return: A list of rating objects
-    :doc-author: Trelent
     """
     sq = select(Rating).offset(offset).limit(limit)
     ratings = db.execute(sq)

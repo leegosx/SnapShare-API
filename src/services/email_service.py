@@ -35,7 +35,6 @@ async def send_email(email: EmailStr, username: str, host: str):
     :param username: str: Pass the username to the template
     :param host: str: Create the link to confirm the email
     :return: A coroutine object
-    :doc-author: Trelent
     """
     try:
         token_verification = auth_service.create_email_token({"sub": email})
@@ -64,7 +63,6 @@ async def send_email_reset_password(token: str, email: EmailStr, username: str):
     :param email: EmailStr: Specify the email address of the recipient
     :param username: str: Pass the username to the template
     :return: A coroutine object
-    :doc-author: Trelent
     """
     try:
         message = MessageSchema(

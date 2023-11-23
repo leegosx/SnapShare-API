@@ -25,7 +25,6 @@ def get_token_user(token: str = Depends(oauth2_scheme), db: Session = Depends(ge
     :param token: str: Pass the token from the http request to this function
     :param db: Session: Access the database
     :return: The token, which is a string
-    :doc-author: Trelent
     """
     return token
 
@@ -48,7 +47,7 @@ class Auth:
         :param plain_password: Pass in the password that is entered by the user
         :param hashed_password: Check the password against the hashed version of it
         :return: A boolean value, true if the password is correct and false if it is not
-        :doc-author: Trelent
+
         """
         return self.pwd_context.verify(plain_password, hashed_password)
 
@@ -60,7 +59,7 @@ class Auth:
         :param self: Make the function a method of the user class
         :param password: str: Get the password from the user
         :return: A hash of the password
-        :doc-author: Trelent
+
         """
         return self.pwd_context.hash(password)
 
@@ -79,7 +78,7 @@ class Auth:
         :param data: dict: Pass the data that will be encoded in the jwt
         :param expires_delta: Optional[float]: Set the expiration time of the access token
         :return: A jwt access token
-        :doc-author: Trelent
+
         """
         to_encode = data.copy()
         if expires_delta:
@@ -108,7 +107,7 @@ class Auth:
         :param data: dict: Pass in the user's data
         :param expires_delta: Optional[float]: Set the expiration time of the token
         :return: A token that is encoded with the user's data and a scope of refresh_token
-        :doc-author: Trelent
+
         """
         to_encode = data.copy()
         if expires_delta:
@@ -135,7 +134,7 @@ class Auth:
         :param self: Represent the instance of the class
         :param data: dict: Pass in the data that will be encoded into a jwt
         :return: A token that is encoded with the user's email address,
-        :doc-author: Trelent
+
         """
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=1)
@@ -156,7 +155,7 @@ class Auth:
         :param self: Represent the instance of the class
         :param refresh_token: str: Pass the refresh token to the function
         :return: The email of the user
-        :doc-author: Trelent
+
         """
         try:
             payload = jwt.decode(
@@ -188,7 +187,7 @@ class Auth:
         :param token: str: Get the token from the authorization header
         :param db: Session: Pass the database session to the function
         :return: A user object
-        :doc-author: Trelent
+
         """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -234,7 +233,7 @@ class Auth:
         :param self: Represent the instance of the class
         :param token: str: Pass in the token that we want to decode
         :return: The email that was encoded in the jwt token
-        :doc-author: Trelent
+
         """
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])

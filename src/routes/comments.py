@@ -64,18 +64,19 @@ async def create_comment(
     ):
     """
     The create_comment function creates a new comment for an image.
-        The function takes in the following parameters:
-            body: CommentRequest - A request object containing the comment's text and user_id.
-            image_id: int - An integer representing the id of an existing image to which we want to add a comment. 
-                This parameter is optional, but if it is not provided, then we will raise a 400 error because this field is required.
-            current_user: User = Depends(auth_service.get_current_user) - A user object that represents our currently logged-in user
+    The function takes in the following parameters:
+    body: CommentRequest - A request object containing the comment's text and user_id.
+    image_id: int - An integer representing the id of an existing image to which we want to add a comment. 
+    This parameter is optional, but if it is not provided, then we will raise a 400 error (bad request).
+    current_user: User = Depends(auth_service.get_current_user) - A user object that represents our currently logged-in user (if any
     
-    :param body: CommentRequest: Get the data from the request body
-    :param image_id: int: Get the image that the comment is being made on
-    :param current_user: User: Get the current user information
-    :param db: Session: Get the database session
-    :return: A comment object, which is the same as the get_comment function
+    :param body: CommentRequest: Validate the request body
+    :param image_id: int: Get the image id from the url
+    :param current_user: User: Get the user who is making the request
+    :param db: Session: Pass the database session to the repository layer
+    :return: A comment object
     """
+
     if image_id == 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Image id is required')
     image = await repository_images.get_image(image_id=image_id, db=db)
@@ -91,9 +92,9 @@ async def update_comment(body: CommentRequest,
                          ):
     """
     The update_comment function updates a comment in the database.
-        The function takes in a CommentRequest object, which contains the new text for the comment.
-        It also takes in an integer representing the id of the comment to be updated. 
-        The function returns an updated Comment object.
+    The function takes in a CommentRequest object, which contains the new text for the comment.
+    It also takes in an integer representing the id of the comment to be updated. 
+    The function returns an updated Comment object.
     
     :param body: CommentRequest: Get the data from the request body
     :param comment_id: int: Identify which comment is being updated
@@ -117,16 +118,18 @@ async def delete_comment(
     ):
     """
     The delete_comment function deletes a comment from the database.
-        Args:
-            comment_id (int): The id of the comment to be deleted.
-            db (Session, optional): SQLAlchemy Session. Defaults to Depends(get_db).
-        Returns:
-            Comment: The deleted Comment object.
+    Args:
+    comment_id (int): The id of the comment to be deleted.
+    db (Session, optional): SQLAlchemy Session. Defaults to Depends(get_db).
+    Returns:
+    Comment: The deleted Comment object.
     
-    :param comment_id: int: Specify the comment id of the comment that is to be deleted
-    :param db: Session: Pass the database session to the repository layer
-    :return: The deleted comment, but it returns a dict
+    :param comment_id: int: Pass in the id of the comment to be deleted
+    :param db: Session: Pass the database session to the repository function
+    :return: A comment object
+    :doc-author: Trelent
     """
+    
     comment = await repository_comments.delete_comment(comment_id, db)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")

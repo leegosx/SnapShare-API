@@ -23,7 +23,6 @@ async def create_image(
     :param current_user: User: Get the current user's id
     :param db: Session: Create a connection to the database
     :return: A new image object
-    :doc-author: Trelent
     """
     image_dump = image_data.model_dump()
     list_tags = db.query(Tag).filter(Tag.name.in_(image_dump["tags"])).all()
@@ -54,7 +53,6 @@ async def add_transform_url_image(
     :param current_user: User: Get the user_id from the database
     :param db: Session: Access the database
     :return: An image object
-    :doc-author: Trelent
     """
     image = (
         db.query(Image)
@@ -89,7 +87,6 @@ async def update_image(
     :param current_user: User: Compare the user_id with the current_user
     :param db: Session: Create a database session
     :return: An image
-    :doc-author: Trelent
     """
     # Compare user_id with current_user.id
     image = (
@@ -123,7 +120,6 @@ async def delete_image(image_id: int, current_user: User, db: Session):
     :param current_user: User: Get the user id from the current_user object
     :param db: Session: Access the database
     :return: The deleted image
-    :doc-author: Trelent
     """
     db_image = (
         db.query(Image)
@@ -153,7 +149,6 @@ async def get_image(image_id: int, db: Session):
     :param image_id: int: Filter the image by id
     :param db: Session: Pass the database session to the function
     :return: An image object
-    :doc-author: Trelent
     """
     return db.query(Image).filter(and_(Image.id == image_id)).first()
 
@@ -167,7 +162,6 @@ async def get_images(skip: int, limit: int, current_user: User, db: Session):
     :param current_user: User: Get the current user's id
     :param db: Session: Pass the database session to the function
     :return: A list of image objects
-    :doc-author: Trelent
     """
     return (
         db.query(Image)
@@ -192,7 +186,6 @@ async def get_image_user(image_id: int, db: Session, current_user: User):
     :param db: Session: Pass the database session to the function
     :param current_user: User: Get the current user
     :return: An image object
-    :doc-author: Trelent
     """
     return (
         db.query(Image)

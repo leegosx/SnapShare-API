@@ -37,7 +37,6 @@ def get_cloudinary_public_id(user: User):
 
     :param user: User: Specify the type of parameter that is being passed in
     :return: A string in the format of snapshare-api/usernameid
-    :doc-author: Trelent
     """
     return f"SnapShare-API/{user.username}{user.id}"
 
@@ -52,7 +51,6 @@ def post_cloudinary_image(file: UploadFile, user: User):
     :param file: UploadFile: Get the file from the request
     :param user: User: Get the user's id
     :return: A url to the image
-    :doc-author: Trelent
     """
     public_id = get_cloudinary_public_id(user)
     r = cloudinary.uploader.upload(file.file, public_id=public_id, owerwrite=True)
@@ -75,7 +73,6 @@ def get_cloudinary_image_transformation(
     :param effect: Add an effect to the image
     :param overlay_image_url: Add an image to the transformation
     :return: A url
-    :doc-author: Trelent
     """
     # Define base transformation
     transformation = {}

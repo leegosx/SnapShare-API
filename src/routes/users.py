@@ -156,7 +156,6 @@ async def ban_user(email: str, db: Session = Depends(get_db)):
     :param email: str: Get the email of a user from the request body
     :param db: Session: Get the database session
     :return: A dictionary with the user and detail
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(email, db)
     if not user:

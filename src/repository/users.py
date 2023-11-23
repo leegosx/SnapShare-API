@@ -36,14 +36,13 @@ async def count_users(db: Session) -> list:
 
 async def create_user(body: UserBase, db: Session) -> User:
     """
-    The create_user function creates a new user in the database.
-        It takes a UserBase object as an argument, and returns a User object.
-        The function first checks if there are any users in the database already,
-            and if not it sets the role of this user to admin.
-
-    :param body: UserBase: Pass the user data to the function
+    The create_user function takes a UserBase object and creates a new user in the database.
+        If there are no users in the database, it will create an admin user. Otherwise, it will create
+        a regular user.
+    
+    :param body: UserBase: Pass in the user data from the request
     :param db: Session: Access the database
-    :return: The new user object
+    :return: A user object
     """
     users_check = await count_users(db)
     avatar = None
@@ -186,7 +185,6 @@ async def save_black_list_token(token: str, user: User, db):
     :param current_user: auth_service.get_current_user: Get the current user
     :param db: Access the database
     :return: The token that was saved
-    :doc-author: Trelent
     """
     blacklist_token = Blacklist(token=token, email=user.email)
     db.add(blacklist_token)
@@ -203,7 +201,6 @@ async def find_black_list_token(token: str, db: Session):
     :param token: str: Pass in the token that is being checked
     :param db: Session: Pass the database session to this function
     :return: A blacklist object if the token is in the blacklist
-    :doc-author: Trelent
     """
     return db.query(Blacklist).filter(Blacklist.token == token).first()
 
@@ -219,7 +216,6 @@ async def to_ban_user(body: UserBase, email: str, db: Session):
     :param email: str: Specify the email of the user that is to be banned
     :param db: Session: Create a connection to the database
     :return: A user object
-    :doc-author: Trelent
     """
     user = db.query(User).filter_by(email=email).first()
     user.ban_status = True
@@ -235,7 +231,6 @@ async def check_ban_status(username: str, db: Session):
     :param username: str: Pass in the username of the user that is trying to log in
     :param db: Session: Access the database
     :return: A boolean value that indicates whether or not the user is banned
-    :doc-author: Trelent
     """
     user = db.query(User).filter_by(email=username).first()
     return user.ban_status

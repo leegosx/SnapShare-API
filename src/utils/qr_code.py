@@ -9,7 +9,6 @@ def create_qr_code_from_url(url):
     
     :param url: Create a qr code from the url
     :return: A string of base64 encoded image data
-    :doc-author: Trelent
     """
     # Generate QR code for the transformed URL
     qr = qrcode.QRCode(
