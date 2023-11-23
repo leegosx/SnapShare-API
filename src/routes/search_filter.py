@@ -6,11 +6,12 @@ from datetime import datetime
 
 from src.database.db import get_db
 from src.models.user import User
+from src.schemas.image import ImageSearch
 from src.repository.search_filter import get_images_by_search
 
 router = APIRouter(prefix="/search_filter", tags=["search_filter"])
 
-@router.get("/search/")
+@router.get("/search/", response_model=List[ImageSearch])
 async def search_images(
     tag: Optional[str] = None,
     keyword: Optional[str] = None,
