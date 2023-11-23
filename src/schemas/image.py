@@ -51,7 +51,7 @@ class ImageSearch(BaseModel):
     updated_at: Optional[datetime] = None
     user_id: int
     tags: List[TagRequest]
-    average_rating: Optional[float] = None
+    rating_score: Optional[float] = None
 
     class Config:
         from_attributes = True
