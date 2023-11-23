@@ -12,6 +12,7 @@ from unittest.mock import MagicMock
 
 from src.routes.ratings import (
     get_rating,
+    get_ratings,
     get_by_photo_ratings,
     remove_rating,
     add_rating
@@ -152,3 +153,29 @@ class TestRatingsRoutes(unittest.IsolatedAsyncioTestCase):
             await add_rating(body, image_id, mock_db, current_user)
 
         self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch('src.repository.ratings.get_all_ratings')
+    async def test_get_all_ratings_success(self, mock_get_all_ratings):
+        mock_db = MagicMock()
+        skip = 0
+        limit = 100
+        mock_ratings = [MagicMock(spec=Rating), MagicMock(spec=Rating)]
+        mock_get_all_ratings.return_value = mock_ratings
+
+        result = await get_ratings(skip, limit, mock_db)
+
+        self.assertEqual(len(result), len(mock_ratings))
+        mock_get_all_ratings.assert_called_with(skip, limit, mock_db)
+
+    @patch('src.repository.ratings.get_all_ratings')
+    async def test_get_all_ratings_no_ratings_found(self, mock_get_all_ratings):
+        mock_db = MagicMock()
+        skip = 0
+        limit = 100
+        mock_get_all_ratings.return_value = []
+
+        with self.assertRaises(HTTPException) as context:
+            await get_ratings(skip, limit, mock_db)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(context.exception.detail, "No ratings found")
