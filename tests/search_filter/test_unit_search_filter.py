@@ -11,13 +11,11 @@ from src.repository.search_filter import get_images_by_search
 class TestSearchFilter(unittest.TestCase):
 
     def setUp(self):
-        # Створення тестової бази даних та об'єкта сесії для використання в тестах
         engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(bind=engine)
         SessionClass = sessionmaker(bind=engine)
         self.db = SessionClass()
 
-        # Додавання тестових даних до бази даних
         user = User(
             username="test_user",
             email="test@example.com",
@@ -37,7 +35,6 @@ class TestSearchFilter(unittest.TestCase):
         self.db.commit()
 
     def test_get_images_by_search(self):
-        # Тест для функції get_images_by_search
 
         # Arrange
         tag = "test_tag"
@@ -58,7 +55,6 @@ class TestSearchFilter(unittest.TestCase):
             end_date=end_date
         )
 
-        # Додайте ці рядки перед return images у вашій функції get_images_by_search
         print("Query parameters:")
         print(f"Tag: {tag}")
         print(f"Keyword: {keyword}")
@@ -77,7 +73,6 @@ class TestSearchFilter(unittest.TestCase):
 
 
     def tearDown(self):
-        # Закриття сесії та очищення бази даних
         self.db.close()
 
 if __name__ == '__main__':
