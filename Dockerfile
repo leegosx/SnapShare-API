@@ -1,4 +1,4 @@
-FROM python:3.11.4
+FROM python:3.10
 
 ENV APP_HOME /app
 
@@ -14,7 +14,7 @@ RUN poetry config virtualenvs.create false && poetry install --only main
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 8000
 
 # Run our application inside the container
-ENTRYPOINT ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
