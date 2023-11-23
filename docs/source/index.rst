@@ -67,6 +67,12 @@ SnapShare-API repository Users
    :undoc-members:
    :show-inheritance:
 
+SnapShare-API repository Search
+===============================
+.. automodule:: src.repository.search_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 SnapShare-API routes Comments
 =============================
@@ -122,6 +128,12 @@ SnapShare-API routes Users
    :undoc-members:
    :show-inheritance:
 
+SnapShare-API routes Search
+==========================
+.. automodule:: src.routes.search_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 SnapShare-API services Auth
 ===========================
