@@ -42,16 +42,4 @@ class ImageURLResponse(BaseModel):
     image_url: str
     image_transformed_url: str
     qr_code: str
-
-
-class ImageSearch(BaseModel):
-    id: int
-    image_url: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    user_id: int
-    tags: List[TagRequest]
-    average_rating: Optional[float] = None
-
-    class Config:
-        from_attributes = True
+    

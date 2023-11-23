@@ -32,6 +32,8 @@ async def read_comments(
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     comments = await repository_comments.get_comments(image_id, db)
+    if not comments:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No comments have been found for this photo")
     return comments
 
 @router.get("/get/{comment_id}/", response_model=CommentResponse)

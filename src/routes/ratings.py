@@ -40,6 +40,7 @@ async def get_by_photo_ratings(image_id: int, db: Session = Depends(get_db)):
             id=rating.id,
             user_id=rating.user_id,
             image_id=rating.image_id,
+            rating_score=rating.rating_score,
             average_rating=average_rating 
         )
         for rating in ratings
