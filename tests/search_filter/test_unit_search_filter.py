@@ -8,7 +8,7 @@ from src.models.user import User
 from src.models.rating import Rating
 from src.repository.search_filter import get_images_by_search
 
-class TestSearchFilter(unittest.TestCase):
+class TestSearchFilter(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
@@ -34,7 +34,7 @@ class TestSearchFilter(unittest.TestCase):
         self.db.add_all([user, tag, image, rating])
         self.db.commit()
 
-    def test_get_images_by_search(self):
+    async def test_get_images_by_search(self):
 
         # Arrange
         tag = "test_tag"
@@ -45,7 +45,7 @@ class TestSearchFilter(unittest.TestCase):
         end_date = datetime.now()
 
         # Act
-        result = get_images_by_search(
+        result = await get_images_by_search(
             self.db,
             tag=tag,
             keyword=keyword,
