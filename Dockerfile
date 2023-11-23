@@ -1,20 +1,17 @@
 FROM python:3.11.4
 
 ENV APP_HOME /app
+WORKDIR $APP_HOME
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR $APP_HOME
+COPY pyproject.toml poetry.lock $APP_HOME/
+RUN pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-dev
 
-COPY pyproject.toml $APP_HOME/pyproject.toml
-COPY poetry.lock $APP_HOME/poetry.lock
+COPY . $APP_HOME
 
-RUN pip install poetry
-RUN poetry config virtualenvs.create false && poetry install --only main
+EXPOSE 8000
 
-COPY . .
-
-EXPOSE 5000
-
-# Run our application inside the container
-ENTRYPOINT ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
