@@ -50,6 +50,7 @@ class ImageSearch(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     user_id: int
+    content: str
     tags: List[TagRequest]
     average_rating: Optional[float] = None
 
