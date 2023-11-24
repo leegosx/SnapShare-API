@@ -14,6 +14,7 @@ from src.schemas.user import UserDb, UserInfo, UserProfile, Username, UsernameRe
 from src.repository import users as repository_users
 from src.services.auth_service import auth_service
 from src.conf.config import settings
+from src.services import roles
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -148,7 +149,7 @@ async def change_username(
     user = await repository_users.update_user(auth_service.redis ,user, db)
     return user
 
-@router.patch('/ban_user')
+@router.patch("/ban_user", dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
 async def ban_user(email: str, db: Session = Depends(get_db)):
     """
     The ban_user function is used to ban a user by email.
