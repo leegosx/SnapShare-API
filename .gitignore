@@ -163,3 +163,5 @@ test.db
 .vscode/
 .pytest_cache/
 postgres-data/
+.fly.toml/
+fly.toml
