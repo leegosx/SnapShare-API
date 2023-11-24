@@ -80,7 +80,6 @@ class TestGetImagesByUser(unittest.TestCase):
     @patch('src.repository.search_filter.get_rating_score')
     @patch('sqlalchemy.orm.Session')
     async def test_get_images_by_user(self, mock_session, mock_get_rating_score):
-        # Підготовка даних
         user_id = 1
         mock_images = [MagicMock(spec=Image), MagicMock(spec=Image)]
         mock_session.query.return_value.filter.return_value = mock_session.query.return_value
@@ -99,6 +98,6 @@ class TestGetImagesByUser(unittest.TestCase):
 
         mock_session.query.assert_called_with(Image)
         mock_session.query.return_value.filter.assert_called_with(Image.user_id == user_id)
-
+    
 if __name__ == '__main__':
     unittest.main()

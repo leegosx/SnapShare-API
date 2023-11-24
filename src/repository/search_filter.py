@@ -85,6 +85,18 @@ async def get_images_by_user(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
 ) -> List[Image]:
+    """
+    The get_images_by_user function returns a list of images that are associated with the user_id passed in.
+        The function also takes optional parameters to filter the results by rating and date range.
+    
+    :param db: Session: Connect to the database
+    :param user_id: int: Filter the images by user_id
+    :param min_rating: int: Filter out images that have a rating score less than the min_rating
+    :param max_rating: int: Set the maximum rating score for an image
+    :param start_date: Optional[str]: Filter the images by a start date
+    :param end_date: Optional[str]: Filter the images by their created_at date
+    :return: A list of usersearchresponse objects
+    """
     query = db.query(Image).filter(Image.user_id == user_id)
     if min_rating is not None or max_rating is not None:
         query = query.join(Rating, isouter=True).group_by(Image.id)

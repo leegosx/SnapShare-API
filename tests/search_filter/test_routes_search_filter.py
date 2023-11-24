@@ -2,8 +2,8 @@ from unittest.mock import patch, MagicMock, ANY
 import unittest
 from fastapi.testclient import TestClient
 from main import app
-from src.models.user import User
 from src.models.image import Image
+from src.models.user import User
 from src.schemas.image import ImageSearch
 
 class TestSearchFilterRoutes(unittest.IsolatedAsyncioTestCase):
