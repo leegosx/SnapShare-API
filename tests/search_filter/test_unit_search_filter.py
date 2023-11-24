@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -6,7 +7,7 @@ from src.models.base import Base
 from src.models.image import Image, Tag
 from src.models.user import User
 from src.models.rating import Rating
-from src.repository.search_filter import get_images_by_search
+from src.repository.search_filter import get_images_by_search, get_images_by_user
 
 class TestSearchFilter(unittest.IsolatedAsyncioTestCase):
 
@@ -74,6 +75,30 @@ class TestSearchFilter(unittest.IsolatedAsyncioTestCase):
 
     def tearDown(self):
         self.db.close()
+
+class TestGetImagesByUser(unittest.TestCase):
+    @patch('src.repository.search_filter.get_rating_score')
+    @patch('sqlalchemy.orm.Session')
+    async def test_get_images_by_user(self, mock_session, mock_get_rating_score):
+        # Підготовка даних
+        user_id = 1
+        mock_images = [MagicMock(spec=Image), MagicMock(spec=Image)]
+        mock_session.query.return_value.filter.return_value = mock_session.query.return_value
+        mock_session.query.return_value.join.return_value = mock_session.query.return_value
+        mock_session.query.return_value.group_by.return_value = mock_session.query.return_value
+        mock_session.query.return_value.having.return_value = mock_session.query.return_value
+        mock_session.query.return_value.all.return_value = mock_images
+        mock_get_rating_score.return_value = 4.5
+
+        result = await get_images_by_user(mock_session, user_id)
+
+        self.assertEqual(len(result), len(mock_images))
+        for image_response in result:
+            self.assertEqual(image_response.user_id, user_id)
+            self.assertEqual(image_response.average_rating, mock_get_rating_score.return_value)
+
+        mock_session.query.assert_called_with(Image)
+        mock_session.query.return_value.filter.assert_called_with(Image.user_id == user_id)
 
 if __name__ == '__main__':
     unittest.main()

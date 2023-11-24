@@ -1,10 +1,13 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_, func
-from src.models.base import Base
 from typing import List, Optional
 
+from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_, func
+
+from src.models.base import Base
+from src.models.user import User
 from src.models.image import Image
 from src.models.rating import Rating
+from src.schemas.user import UserSearchResponse
 
 async def get_rating_score(image_id: int, db: Session) -> Optional[float]:
     """
@@ -72,3 +75,43 @@ async def get_images_by_search(
     for image in images:
         image.average_rating = await get_rating_score(image.id, db)
     return images
+
+
+async def get_images_by_user(
+    db: Session,
+    user_id: int,
+    min_rating: int = 0,
+    max_rating: int = 5,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> List[Image]:
+    query = db.query(Image).filter(Image.user_id == user_id)
+    if min_rating is not None or max_rating is not None:
+        query = query.join(Rating, isouter=True).group_by(Image.id)
+        if min_rating is not None:
+            query = query.having(func.coalesce(func.avg(Rating.rating_score), 0) >= min_rating)
+        if max_rating is not None:
+            query = query.having(func.coalesce(func.avg(Rating.rating_score), 0) <= max_rating)
+
+    if start_date is not None:
+        query = query.filter(Image.created_at >= start_date)
+
+    if end_date is not None:
+        query = query.filter(Image.created_at <= end_date)
+
+    images = query.all()
+    result_list = []
+    for image in images:
+        result = UserSearchResponse(
+            id=image.id,
+            image_url=image.image_url,
+            username=image.user.username,
+            created_at=image.created_at,
+            updated_at=image.updated_at,
+            user_id=image.user_id,
+            content=image.content,
+            average_rating=await get_rating_score(image.id, db)
+        )
+        result_list.append(result)
+
+    return result_list

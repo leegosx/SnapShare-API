@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from typing import ClassVar
@@ -69,3 +69,14 @@ class UsernameResonpose(BaseModel):
 class ChangePassword(BaseModel):
     current_password: str
     new_password: str
+    
+    
+class UserSearchResponse(BaseModel):
+    id: int
+    image_url: str
+    username: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    user_id: int
+    content: str
+    average_rating: Optional[float] = None
