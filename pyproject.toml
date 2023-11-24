@@ -30,6 +30,8 @@ redis = "^5.0.1"
 python-multipart = "^0.0.6"
 pytest-cov = "^4.1.0"
 qrcode = {extras = ["pil"], version = "^7.4.2"}
+psycopg2 = "^2.9.9"
+psycopg = "^3.1.13"
 
 
 [tool.poetry.dependencies.fastapi-mail]

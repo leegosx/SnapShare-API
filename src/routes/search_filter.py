@@ -7,7 +7,9 @@ from datetime import datetime
 from src.database.db import get_db
 from src.models.user import User
 from src.schemas.image import ImageSearch
+from src.schemas.user import UserSearchResponse
 from src.repository import search_filter as repository_search_filter
+from src.services import roles
 
 router = APIRouter(prefix="/search_filter", tags=["search_filter"])
 
@@ -50,3 +52,34 @@ async def search_images(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No images with rating found")
     
     return images
+
+@router.get("/search/{user_id}/images", response_model=List[UserSearchResponse],
+            dependencies=[Depends(roles.Roles(["admin", "moderator"]))])
+async def search_images_by_user(
+    user_id: int,
+    min_rating: int = Query(0, description="Minimum rating"),
+    max_rating: int = Query(5, description="Maximum rating"),
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    The search_images_by_user function searches for images by a user.
+    
+    :param user_id: int: Specify the user id of the user whose images are to be searched
+    :param min_rating: int: Set the minimum rating of an image
+    :param description: Describe the parameter in the swagger documentation
+    :param max_rating: int: Set the maximum rating that can be returned
+    :param description: Describe the parameter in the swagger documentation
+    :param start_date: Optional[str]: Specify that the start_date parameter is optional
+    :param end_date: Optional[str]: Specify that the end_date parameter is optional
+    :param db: Session: Get the database session
+    :return: A list of images
+    """
+    user_exists = user_exists = db.query(User).filter(User.id == user_id).first()
+    if not user_exists:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"User with id {user_id} not found."
+        )
+    return await repository_search_filter.get_images_by_user(db, user_id, min_rating, max_rating, start_date, end_date)
