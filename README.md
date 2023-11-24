@@ -2,25 +2,71 @@
 
 ## About The Project
 
-PhotoShare is a robust photo-sharing application designed to facilitate the seamless exchange of images among users. Built on the high-performance FastAPI framework, it features a RESTful API backend that provides a suite of functionalities:
+SnapShare is a robust photo-sharing application designed to facilitate the seamless exchange of images among users. At its core, it's built on the high-performance FastAPI framework and boasts a RESTful API backend brimming with features. This application is not just a project; it's a showcase of modern web application development expertise, ready to be a part of your portfolio.
 
-- **Authentication**: Implemented via JWT tokens, supporting multiple user roles including regular users, moderators, and administrators.
-- **Image Operations**: Users can upload, delete, and update image descriptions, as well as retrieve images via unique links.
-- **Tagging**: Support for up to 5 unique tags per image, with existing tags reused across the application.
-- **Image Transformations**: Integration with Cloudinary for advanced image operations, allowing users to transform images and generate viewable links and QR codes.
-- **Commenting System**: Each image can be commented on by users, with timestamps for creation and edit, and moderation by admins.
-- **User Profiles**: Users can view and edit their profiles, showcasing their activity and contributions to the platform.
-- **Administration**: Extended controls for administrators, including user bans and complete CRUD capabilities over user-generated content.
+### Features
 
-The project is designed with scalability and security in mind, utilizing PostgreSQL for data persistence, SQLAlchemy for ORM, and following best practices for API development. Complete with Swagger documentation, PhotoShare is ready to be a part of your portfolio and a testament to your expertise in modern web application development.
+- **Authentication:** Securely implemented via JWT tokens. It supports multiple user roles, including regular users, moderators, and administrators.
+- **Image Operations:** Users can upload, delete, and update image descriptions. Images are accessible via unique links.
+- **Tagging:** Add up to 5 unique tags per image, with reusable tags across the application.
+- **Image Transformations:** Powered by Cloudinary for advanced operations. Transform images, generate viewable links, and create QR codes.
+- **Commenting System:** Users can comment on each image, complete with timestamps. Admins have moderation capabilities.
+- **User Profiles:** Users can view and edit their profiles, highlighting their activity and contributions.
+- **Administration:** Extended controls for administrators, including user management and content moderation.
+
+### Built With
+
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Cloudinary
+- JWT for Authentication
 
 ## Getting Started
 
+To get a local copy up and running, follow these simple steps.
+
 ### Prerequisites
 
-- Python 3.8 or higher
-- PostgreSQL
-- Cloudinary account
+- Python Environment
+- Poetry Package Manager
 
 ### Installation
-To be continued..
+
+1. Clone the repo:
+   ```sh
+   git clone https://github.com/your-repo/snapshare-api.git
+   ```
+2. Navigate to the project directory:
+   ```sh
+   cd snapshare-api
+   ```
+3. Initialize the project using Poetry:
+   ```sh
+   poetry install
+   ```
+4. Run the server:
+   ```sh
+   uvicorn main:app --reload
+   ```
+
+## Usage
+
+For a detailed guide on how to use SnapShare, please refer to the [documentation](https://snapshare-api.fly.dev/docs#/).
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Feel free to reach out to any of our team members:
+
+- Dmytro Klymenko [Team Leader] - [GitHub](https://github.com/leegosx) | [LinkedIn](https://www.linkedin.com/in/dmytro-klymenko-ab1356290/)
+- Dmytro Filin [Scrum master] - [GitHub](https://github.com/UkrainianEagleOwl) | [LinkedIn](https://www.linkedin.com/in/dmytro-filin-18716b198/)
+- Illya Hryhoriev [Developer] - [GitHub](https://github.com/Adentas)
+- Dmytro Paukov [Developer] - [GitHub](https://github.com/paukdv)
