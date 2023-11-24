@@ -66,7 +66,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Feel free to reach out to any of our team members:
 
-- Dmytro Klymenko - [GitHub](https://github.com/leegosx) | [LinkedIn](https://www.linkedin.com/in/dmytro-klymenko-ab1356290/)
-- Dmytro Filin - [GitHub](https://github.com/UkrainianEagleOwl) | [LinkedIn](https://www.linkedin.com/in/dmytro-filin-18716b198/)
-- Illya Hryhoriev - [GitHub](https://github.com/Adentas)
-- Dmytro Paukov - [GitHub](https://github.com/paukdv)
+- Dmytro Klymenko [Team Leader] - [GitHub](https://github.com/leegosx) | [LinkedIn](https://www.linkedin.com/in/dmytro-klymenko-ab1356290/)
+- Dmytro Filin [Scrum master] - [GitHub](https://github.com/UkrainianEagleOwl) | [LinkedIn](https://www.linkedin.com/in/dmytro-filin-18716b198/)
+- Illya Hryhoriev [Developer] - [GitHub](https://github.com/Adentas)
+- Dmytro Paukov [Developer] - [GitHub](https://github.com/paukdv)
